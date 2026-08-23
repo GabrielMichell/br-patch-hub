@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 1,
-  "catalogName": "Catálogo de traduções",
+  "schemaVersion": 2,
+  "catalogName": "Catálogo de traduções PT-BR",
   "updatedAt": "2026-08-23T00:00:00Z",
   "translations": [
     {
@@ -8,21 +8,73 @@
       "game": "Nome do jogo",
       "language": "pt-BR",
       "version": "1.0.0",
-      "packageType": "installer",
-      "description": "O app baixa os arquivos, valida os hashes e abre o instalador oficial.",
-      "releaseUrl": "https://github.com/SEU_USUARIO/SUA_REPO/releases/tag/v1.0.0",
+      "packageType": "zip",
+      "description": "Pacote de arquivos instalado pelo TradutorHub.",
+      "folderHints": ["Nome da pasta Steam"],
+      "install": [
+        { "from": "MinhaPasta_Data", "to": "game" }
+      ],
       "assets": [
         {
-          "role": "installer",
-          "fileName": "Meu-Jogo-PTBR-Instalador-v1.0.exe",
-          "downloadUrl": "https://github.com/SEU_USUARIO/SUA_REPO/releases/download/v1.0.0/Meu-Jogo-PTBR-Instalador-v1.0.exe",
-          "sha256": "COLE_AQUI_O_SHA256_DO_EXE"
+          "role": "package",
+          "fileName": "Minha-Traducao-v1.0.zip",
+          "downloadUrl": "https://github.com/usuario/repositorio/releases/download/v1.0.0/Minha-Traducao-v1.0.zip",
+          "sha256": "HASH_SHA256_DO_ZIP"
+        }
+      ]
+    },
+    {
+      "id": "jogo-com-partes-ptbr",
+      "game": "Jogo com várias partes",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "packageType": "multi-zip",
+      "folderHints": ["Nome da pasta Steam"],
+      "install": [
+        { "from": ".", "to": "game" }
+      ],
+      "assets": [
+        {
+          "role": "package",
+          "fileName": "Dados-01.zip",
+          "downloadUrl": "https://github.com/usuario/repositorio/releases/download/v1.0.0/Dados-01.zip",
+          "sha256": "HASH_SHA256_DA_PARTE_01"
         },
         {
-          "role": "dependency",
-          "fileName": "Meu-Jogo-PTBR-Dados-01.zip",
-          "downloadUrl": "https://github.com/SEU_USUARIO/SUA_REPO/releases/download/v1.0.0/Meu-Jogo-PTBR-Dados-01.zip",
-          "sha256": "COLE_AQUI_O_SHA256_DA_PARTE"
+          "role": "package",
+          "fileName": "Dados-02.zip",
+          "downloadUrl": "https://github.com/usuario/repositorio/releases/download/v1.0.0/Dados-02.zip",
+          "sha256": "HASH_SHA256_DA_PARTE_02"
+        }
+      ]
+    },
+    {
+      "id": "jogo-com-operacao-ptbr",
+      "game": "Jogo com arquivo especial",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "packageType": "zip",
+      "folderHints": ["Nome da pasta Steam"],
+      "operations": [
+        {
+          "type": "append",
+          "from": "payload.bin",
+          "to": "arquivo-original.bin",
+          "alignment": 16,
+          "expectedSize": 123456
+        },
+        {
+          "type": "copy",
+          "from": "indice.bin",
+          "to": "indice-original.bin"
+        }
+      ],
+      "assets": [
+        {
+          "role": "package",
+          "fileName": "Pacote-manual.zip",
+          "downloadUrl": "https://github.com/usuario/repositorio/releases/download/v1.0.0/Pacote-manual.zip",
+          "sha256": "HASH_SHA256_DO_ZIP"
         }
       ]
     }
