@@ -75,6 +75,12 @@
       "description": "Pacote manual instalado diretamente na pasta Lucius3_Data, com backup dos arquivos substituídos.",
       "releaseUrl": "https://github.com/GabrielMichell/lucius-iii-ptbr/releases/tag/v1.0.0",
       "steamAppId": "513290",
+      "steamCleanup": [
+        {
+          "path": "Lucius3_Data/StreamingAssets/Localization/Português.csv",
+          "sha256": "c8c876aa605d0653c2e7c1d2a5f528b833b9126526b1e35a1d88e39ede7c8542"
+        }
+      ],
       "folderHints": ["Lucius III"],
       "install": [
         { "from": "Lucius3_Data", "to": "Lucius3_Data" }
