@@ -1,7 +1,7 @@
 {
-  "version": "1.1.1",
-  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v1.1.1",
-  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v1.1.1/Central-PT-BR.exe",
-  "sha256": "0b57285c7803b46414f6f0e42e8bc8d3c60328534c72c4924d8adf0e6982e189",
-  "notes": "Adiciona a logo oficial no cabeçalho e um aviso destacado para baixar a Central PT-BR somente pelo GitHub oficial de GabrielMichell."
+  "version": "1.1.2",
+  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v1.1.2",
+  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v1.1.2/Central-PT-BR.exe",
+  "sha256": "8564a8305062d58aa3e10e05af0f1a05895319cfe198cf0214ad72f40e46ea63",
+  "notes": "Substitui a logo pela versão circular transparente e remove o fundo branco ao redor da imagem no cabeçalho."
 }
