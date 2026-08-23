@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "catalogName": "Catálogo de traduções",
+  "updatedAt": "2026-08-23T00:00:00Z",
+  "translations": [
+    {
+      "id": "meu-jogo-ptbr",
+      "game": "Nome do jogo",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "description": "Descrição curta da tradução.",
+      "downloadUrl": "https://github.com/SEU_USUARIO/SUA_REPO/releases/download/meu-jogo-1.0.0/meu-jogo-ptbr.zip",
+      "sha256": "COLE_AQUI_O_SHA256_DO_ZIP",
+      "executableHints": [
+        "Game.exe"
+      ],
+      "install": [
+        {
+          "from": "files",
+          "to": "game"
+        }
+      ]
+    }
+  ]
+}
