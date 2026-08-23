@@ -1,7 +1,7 @@
 {
-  "version": "1.1.0",
-  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v1.1.0",
-  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v1.1.0/Central-PT-BR.exe",
-  "sha256": "88c10479863816e3411e6f6d2be08ddb959e35d340b2460a08d06d9ff0f9b74d",
-  "notes": "Atualização automática completa: download, validação SHA-256, substituição segura e reinicialização da Central."
+  "version": "1.1.1",
+  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v1.1.1",
+  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v1.1.1/Central-PT-BR.exe",
+  "sha256": "0b57285c7803b46414f6f0e42e8bc8d3c60328534c72c4924d8adf0e6982e189",
+  "notes": "Adiciona a logo oficial no cabeçalho e um aviso destacado para baixar a Central PT-BR somente pelo GitHub oficial de GabrielMichell."
 }
