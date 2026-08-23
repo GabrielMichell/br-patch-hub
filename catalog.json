@@ -1,6 +1,117 @@
 {
   "schemaVersion": 1,
-  "catalogName": "Meu catálogo de traduções",
+  "catalogName": "Catálogo de traduções PT-BR",
   "updatedAt": "2026-08-23T00:00:00Z",
-  "translations": []
+  "translations": [
+    {
+      "id": "lucius-ii-ptbr",
+      "game": "Lucius II",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "packageType": "installer",
+      "description": "Instalador oficial da tradução PT-BR. Requer o instalador e quatro partes de dados na mesma pasta.",
+      "releaseUrl": "https://github.com/GabrielMichell/lucius-ii-ptbr/releases/tag/v1.0.0",
+      "assets": [
+        {
+          "role": "installer",
+          "fileName": "Lucius-II-PTBR-Instalador-v1.0.exe",
+          "downloadUrl": "https://github.com/GabrielMichell/lucius-ii-ptbr/releases/download/v1.0.0/Lucius-II-PTBR-Instalador-v1.0.exe",
+          "sha256": "e3ee29cf7bbaf5b054eeed0159765ac3268aa8ee093e4e85fb233299f635e720"
+        },
+        {
+          "role": "dependency",
+          "fileName": "Lucius-II-PTBR-Dados-01.zip",
+          "downloadUrl": "https://github.com/GabrielMichell/lucius-ii-ptbr/releases/download/v1.0.0/Lucius-II-PTBR-Dados-01.zip",
+          "sha256": "6beca5fbb5c87a6a02ab49f326c596962f0ad471f48af49ec2e7b2914007e2c9"
+        },
+        {
+          "role": "dependency",
+          "fileName": "Lucius-II-PTBR-Dados-02.zip",
+          "downloadUrl": "https://github.com/GabrielMichell/lucius-ii-ptbr/releases/download/v1.0.0/Lucius-II-PTBR-Dados-02.zip",
+          "sha256": "3f385b0509fdec4f92b376691f6bc84731e2d6fa5bc006a000a3961c72b6cc5a"
+        },
+        {
+          "role": "dependency",
+          "fileName": "Lucius-II-PTBR-Dados-03.zip",
+          "downloadUrl": "https://github.com/GabrielMichell/lucius-ii-ptbr/releases/download/v1.0.0/Lucius-II-PTBR-Dados-03.zip",
+          "sha256": "d05b848f5c91a807635031dfbbc7173f3b8e691fe7acbd5d5904ad4f060ac6b3"
+        },
+        {
+          "role": "dependency",
+          "fileName": "Lucius-II-PTBR-Dados-04.zip",
+          "downloadUrl": "https://github.com/GabrielMichell/lucius-ii-ptbr/releases/download/v1.0.0/Lucius-II-PTBR-Dados-04.zip",
+          "sha256": "f7313abaabb75e1a3c7e0a930a0aed3c839b8f0120fcc464f61ec68a13ce14e2"
+        }
+      ]
+    },
+    {
+      "id": "stories-untold-ptbr",
+      "game": "Stories Untold",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "packageType": "installer",
+      "description": "Instalador automático da tradução PT-BR.",
+      "releaseUrl": "https://github.com/GabrielMichell/stories-untold-ptbr/releases/tag/v1.0.0",
+      "assets": [
+        {
+          "role": "installer",
+          "fileName": "Traducao-PTBR-Stories-Untold-Instalador-v1.0.exe",
+          "downloadUrl": "https://github.com/GabrielMichell/stories-untold-ptbr/releases/download/v1.0.0/Traducao-PTBR-Stories-Untold-Instalador-v1.0.exe",
+          "sha256": "f0d9e6f465844fcbd09c290aa6223b0b84cf0ebf666526c9eae0f7acd26b9ab6"
+        }
+      ]
+    },
+    {
+      "id": "lucius-iii-ptbr",
+      "game": "Lucius III",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "packageType": "installer",
+      "description": "Instalador automático da tradução PT-BR.",
+      "releaseUrl": "https://github.com/GabrielMichell/lucius-iii-ptbr/releases/tag/v1.0.0",
+      "assets": [
+        {
+          "role": "installer",
+          "fileName": "Lucius-III-PTBR-Instalador-v1.0.exe",
+          "downloadUrl": "https://github.com/GabrielMichell/lucius-iii-ptbr/releases/download/v1.0.0/Lucius-III-PTBR-Instalador-v1.0.exe",
+          "sha256": "e68a9c05a2d3ce9542868cf10eddbc321f83d7ff0e824e6d444a90872f061718"
+        }
+      ]
+    },
+    {
+      "id": "metro-last-light-ptbr",
+      "game": "Metro: Last Light Complete Edition",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "packageType": "installer",
+      "description": "Instalador automático da tradução PT-BR para a versão original da Steam.",
+      "releaseUrl": "https://github.com/GabrielMichell/metro-last-light-ptbr/releases/tag/v1.0.0",
+      "assets": [
+        {
+          "role": "installer",
+          "fileName": "Metro-Last-Light-PTBR-v1.0.0-instalador.exe",
+          "downloadUrl": "https://github.com/GabrielMichell/metro-last-light-ptbr/releases/download/v1.0.0/Metro-Last-Light-PTBR-v1.0.0-instalador.exe",
+          "sha256": "8cab15fa4451a538a8cab3081cc07d95f55cd825ad4de76c3f0b3da4a5362c6d"
+        }
+      ]
+    },
+    {
+      "id": "the-survey-ptbr",
+      "game": "The Survey",
+      "language": "pt-BR",
+      "version": "1.1",
+      "packageType": "installer",
+      "description": "Instalador automático da versão v1.1 da tradução PT-BR.",
+      "releaseUrl": "https://github.com/GabrielMichell/the-survey-ptbr/releases/tag/v1.1",
+      "assets": [
+        {
+          "role": "installer",
+          "fileName": "Traducao-PTBR-The-Survey-Instalador-v1.1.exe",
+          "downloadUrl": "https://github.com/GabrielMichell/the-survey-ptbr/releases/download/v1.1/Traducao-PTBR-The-Survey-Instalador-v1.1.exe",
+          "sha256": "2e7c555c967a39dcea15fa01218b44fcc6490b1077e47ebc184c30e43899869f"
+        }
+      ]
+    }
+  ]
 }
+
