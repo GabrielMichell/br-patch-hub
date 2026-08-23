@@ -1,6 +1,7 @@
 {
-  "version": "1.0.0",
-  "releaseUrl": "https://github.com/GabrielMichell/tradutor-hub-catalogo/releases/latest",
-  "downloadUrl": "",
-  "notes": "Primeira versão profissional da Central PT-BR em C#/.NET."
+  "version": "1.1.0",
+  "releaseUrl": "https://github.com/GabrielMichell/tradutor-hub-catalogo/releases/tag/v1.1.0",
+  "downloadUrl": "https://github.com/GabrielMichell/tradutor-hub-catalogo/releases/download/v1.1.0/Central-PT-BR.exe",
+  "sha256": "88c10479863816e3411e6f6d2be08ddb959e35d340b2460a08d06d9ff0f9b74d",
+  "notes": "Atualização automática completa: download, validação SHA-256, substituição segura e reinicialização da Central."
 }
