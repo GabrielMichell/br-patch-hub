@@ -81,6 +81,11 @@
           "sha256": "c8c876aa605d0653c2e7c1d2a5f528b833b9126526b1e35a1d88e39ede7c8542"
         }
       ],
+      "languagePreferenceRepair": {
+        "path": "AppData/LocalLow/Shiver Games/Lucius III/config.sav",
+        "from": "Português",
+        "to": "English"
+      },
       "folderHints": ["Lucius III"],
       "install": [
         { "from": "Lucius3_Data", "to": "Lucius3_Data" }
