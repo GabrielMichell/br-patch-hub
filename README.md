@@ -1,104 +1,79 @@
 # TradutorHub
 
-Base de um aplicativo desktop para distribuir, instalar e atualizar traduções de jogos a partir de um catálogo hospedado no GitHub.
+Aplicativo desktop para listar traduções e abrir os instaladores oficiais publicados nas releases do GitHub.
 
-## O que esta base já faz
+## O que esta base faz
 
 - Lê um catalog.json público hospedado no GitHub.
 - Lista várias traduções em um catálogo modular.
-- Baixa cada tradução como um ZIP a partir de uma release do GitHub.
-- Valida o SHA-256 do pacote quando o campo sha256 é informado.
-- Detecta jogos em pastas comuns da Steam quando executableHints é informado.
-- Permite escolher manualmente a pasta do jogo.
-- Instala somente os arquivos declarados em install.
-- Mantém registro dos arquivos instalados e dos backups originais.
-- Impede que uma tradução sobrescreva arquivos registrados como pertencentes a outra tradução.
-- Atualiza uma tradução removendo a versão anterior de forma controlada.
-- Desinstala e restaura arquivos originais quando possível.
-- Atualiza o catálogo ao abrir e depois a cada 6 horas.
+- Baixa instaladores EXE e suas dependências ZIP quando necessário.
+- Guarda todos os arquivos do mesmo pacote em uma pasta exclusiva.
+- Valida o SHA-256 de cada arquivo antes de abrir o instalador.
+- Usa cache por tradução e versão para não baixar novamente arquivos válidos.
+- Abre o instalador oficial somente depois de uma confirmação.
+- Atualiza o catálogo automaticamente ao abrir e depois a cada 6 horas.
+
+O instalador continua responsável por detectar a pasta do jogo, instalar os arquivos, criar backups e remover a tradução. O TradutorHub não executa o EXE de forma silenciosa.
 
 ## Como executar
 
-1. Dê duplo clique em TradutorHub.bat, ou abra o PowerShell.
-2. Para executar pelo PowerShell:
-
-~~~powershell
-powershell -ExecutionPolicy Bypass -File .\TradutorHub.ps1
-~~~
-
-O Windows pode mostrar um aviso porque este protótipo ainda não possui assinatura digital. Na versão distribuível, o próximo passo é empacotar e assinar o aplicativo.
-
-## Como publicar as traduções no GitHub
-
-Você pode ter um repositório só para o catálogo e um repositório por tradução, ou colocar tudo em um repositório central. O aplicativo só precisa de uma URL pública para o catalog.json.
-
-Exemplo de estrutura de um repositório de tradução:
-
-~~~text
-catalog.json
-releases/
-  meu-jogo-ptbr.zip
-~~~
-
-O ZIP deve conter a pasta indicada em install.from. Por exemplo:
-
-~~~text
-meu-jogo-ptbr.zip
-└── files/
-    ├── localization/
-    │   └── pt-BR.lng
-    └── readme.txt
-~~~
-
-No catalog.json, a regra:
-
-~~~json
-{
-  "from": "files",
-  "to": "game"
-}
-~~~
-
-copia o conteúdo de files para a pasta escolhida do jogo. Também é possível usar uma subpasta:
-
-~~~json
-{
-  "from": "files/localization",
-  "to": "localization"
-}
-~~~
-
-O arquivo catalog.example.json nesta pasta mostra todos os campos disponíveis.
-
-## URL do catálogo
-
-O aplicativo já vem configurado para:
+1. Dê duplo clique em TradutorHub.bat.
+2. O aplicativo já vem apontando para:
 
 ~~~text
 https://raw.githubusercontent.com/GabrielMichell/tradutor-hub-catalogo/main/catalog.json
 ~~~
 
-Se você mover o catálogo para outro repositório, substitua pela URL raw correspondente, por exemplo:
+3. Selecione uma tradução e clique em Baixar e abrir instalador.
+4. Confirme a abertura do instalador oficial.
 
-~~~text
-https://raw.githubusercontent.com/seu-usuario/seu-repositorio/main/catalog.json
+## Como cadastrar uma tradução
+
+Cada item do catalog.json usa packageType installer e possui uma lista de assets. Um asset com role installer é o EXE que será aberto. Assets com role dependency são baixados para a mesma pasta antes da execução.
+
+~~~json
+{
+  "id": "meu-jogo-ptbr",
+  "game": "Nome do jogo",
+  "language": "pt-BR",
+  "version": "1.0.0",
+  "packageType": "installer",
+  "assets": [
+    {
+      "role": "installer",
+      "fileName": "Meu-Jogo-Instalador.exe",
+      "downloadUrl": "https://github.com/usuario/repo/releases/download/v1.0.0/Meu-Jogo-Instalador.exe",
+      "sha256": "HASH_DO_EXE"
+    },
+    {
+      "role": "dependency",
+      "fileName": "Dados-01.zip",
+      "downloadUrl": "https://github.com/usuario/repo/releases/download/v1.0.0/Dados-01.zip",
+      "sha256": "HASH_DA_PARTE"
+    }
+  ]
+}
 ~~~
 
-O catálogo pode ser atualizado sem recompilar o aplicativo.
+Para um instalador sem partes, basta cadastrar apenas o asset com role installer. Para instaladores divididos, cadastre todas as partes. O app só abre o EXE quando todos os downloads e validações terminarem.
 
-## Arquivos locais de dados
+O arquivo catalog.example.json mostra o modelo completo.
 
-O aplicativo salva dados em:
+## Arquivos locais
+
+O aplicativo salva configurações, cache e pacotes baixados em:
 
 ~~~text
 %LOCALAPPDATA%\TradutorHub
 ~~~
 
-Ali ficam o catálogo em cache, as configurações, o registro de instalações e os backups. Os backups são separados por tradução e versão.
+Os pacotes ficam separados por tradução e versão. Os arquivos originais dos jogos continuam nos repositórios de cada tradução; o catálogo apenas aponta para as releases oficiais.
 
-## Limitações intencionais desta primeira base
+## Segurança e limitações
 
-Esta versão trabalha com cópia de arquivos declarada no manifesto. Alguns jogos exigem operações específicas, como editar arquivos Unity, alterar manifestos, aplicar patch binário ou instalar por um gerenciador de mods. A arquitetura já separa o catálogo do instalador, então esses casos podem receber adaptadores modulares em uma próxima etapa sem alterar a tela principal.
-
-O aplicativo não possui um GitHub próprio. Ele foi preparado para consumir o seu repositório público; quando você me passar o usuário/repositório, a URL padrão pode ser ajustada.
+- O aplicativo não baixa executáveis de URLs fora do catalog.json.
+- Cada asset pode exigir SHA-256; sem hash, o download é permitido, mas não há validação de integridade.
+- A abertura do EXE sempre pede confirmação.
+- O Windows pode apresentar SmartScreen ou UAC, especialmente para instaladores sem assinatura digital.
+- O usuário deve confirmar que a release e o hash pertencem ao projeto correto.
 
