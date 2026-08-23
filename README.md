@@ -72,16 +72,16 @@ O arquivo catalog.example.json nesta pasta mostra todos os campos disponíveis.
 
 ## URL do catálogo
 
-Na primeira execução, substitua:
+O aplicativo já vem configurado para:
 
 ~~~text
-https://raw.githubusercontent.com/SEU_USUARIO/tradutor-hub-catalogo/main/catalog.json
+https://raw.githubusercontent.com/GabrielMichell/tradutor-hub-catalogo/main/catalog.json
 ~~~
 
-pela URL raw do seu repositório, por exemplo:
+Se você mover o catálogo para outro repositório, substitua pela URL raw correspondente, por exemplo:
 
 ~~~text
-https://raw.githubusercontent.com/seu-usuario/tradutor-hub-catalogo/main/catalog.json
+https://raw.githubusercontent.com/seu-usuario/seu-repositorio/main/catalog.json
 ~~~
 
 O catálogo pode ser atualizado sem recompilar o aplicativo.
@@ -101,3 +101,4 @@ Ali ficam o catálogo em cache, as configurações, o registro de instalações 
 Esta versão trabalha com cópia de arquivos declarada no manifesto. Alguns jogos exigem operações específicas, como editar arquivos Unity, alterar manifestos, aplicar patch binário ou instalar por um gerenciador de mods. A arquitetura já separa o catálogo do instalador, então esses casos podem receber adaptadores modulares em uma próxima etapa sem alterar a tela principal.
 
 O aplicativo não possui um GitHub próprio. Ele foi preparado para consumir o seu repositório público; quando você me passar o usuário/repositório, a URL padrão pode ser ajustada.
+
