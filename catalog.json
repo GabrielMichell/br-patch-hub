@@ -53,7 +53,7 @@
       "releaseUrl": "https://github.com/GabrielMichell/stories-untold-ptbr/releases/tag/v1.0.0",
       "folderHints": ["Stories Untold"],
       "install": [
-        { "from": "Stories Untold_Data", "to": "game/Stories Untold_Data" }
+        { "from": "Stories Untold_Data", "to": "Stories Untold_Data" }
       ],
       "assets": [
         {
@@ -74,7 +74,7 @@
       "releaseUrl": "https://github.com/GabrielMichell/lucius-iii-ptbr/releases/tag/v1.0.0",
       "folderHints": ["Lucius III"],
       "install": [
-        { "from": "Lucius3_Data", "to": "game/Lucius3_Data" }
+        { "from": "Lucius3_Data", "to": "Lucius3_Data" }
       ],
       "assets": [
         {
@@ -128,7 +128,7 @@
       "releaseUrl": "https://github.com/GabrielMichell/the-survey-ptbr/releases/tag/v1.1",
       "folderHints": ["The Survey"],
       "install": [
-        { "from": "Visibility03_Data", "to": "game/Visibility03_Data" }
+        { "from": "Visibility03_Data", "to": "Visibility03_Data" }
       ],
       "assets": [
         {
