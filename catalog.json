@@ -11,6 +11,7 @@
       "packageType": "multi-zip",
       "description": "Pacote interno da tradução PT-BR. O TradutorHub baixa e extrai automaticamente as quatro partes necessárias.",
       "releaseUrl": "https://github.com/GabrielMichell/lucius-ii-ptbr/releases/tag/v1.0.0",
+      "steamAppId": "296830",
       "folderHints": ["LuciusII"],
       "executableHints": ["LuciusII.exe"],
       "install": [
@@ -51,6 +52,7 @@
       "packageType": "zip",
       "description": "Pacote manual instalado diretamente na pasta Stories Untold_Data, com backup dos arquivos substituídos.",
       "releaseUrl": "https://github.com/GabrielMichell/stories-untold-ptbr/releases/tag/v1.0.0",
+      "steamAppId": "558420",
       "folderHints": ["Stories Untold"],
       "install": [
         { "from": "Stories Untold_Data", "to": "Stories Untold_Data" }
@@ -72,6 +74,7 @@
       "packageType": "zip",
       "description": "Pacote manual instalado diretamente na pasta Lucius3_Data, com backup dos arquivos substituídos.",
       "releaseUrl": "https://github.com/GabrielMichell/lucius-iii-ptbr/releases/tag/v1.0.0",
+      "steamAppId": "513290",
       "folderHints": ["Lucius III"],
       "install": [
         { "from": "Lucius3_Data", "to": "Lucius3_Data" }
@@ -93,6 +96,7 @@
       "packageType": "zip",
       "description": "Pacote manual interno. O TradutorHub cria o backup e aplica o complemento nos arquivos VFS sem executar o instalador.",
       "releaseUrl": "https://github.com/GabrielMichell/metro-last-light-ptbr/releases/tag/v1.0.0",
+      "steamAppId": "43160",
       "folderHints": ["Metro Last Light"],
       "executableHints": ["MetroLL.exe"],
       "operations": [
@@ -126,6 +130,7 @@
       "packageType": "zip",
       "description": "Pacote manual interno da versão v1.1, instalado diretamente na pasta Visibility03_Data.",
       "releaseUrl": "https://github.com/GabrielMichell/the-survey-ptbr/releases/tag/v1.1",
+      "steamAppId": "547910",
       "folderHints": ["The Survey"],
       "install": [
         { "from": "Visibility03_Data", "to": "Visibility03_Data" }
