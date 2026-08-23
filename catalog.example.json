@@ -9,7 +9,7 @@
       "language": "pt-BR",
       "version": "1.0.0",
       "packageType": "zip",
-      "description": "Pacote de arquivos instalado pelo TradutorHub.",
+      "description": "Pacote de arquivos instalado pela Central PT-BR.",
       "folderHints": ["Nome da pasta Steam"],
       "install": [
         { "from": "MinhaPasta_Data", "to": "game" }

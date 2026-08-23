@@ -1,4 +1,4 @@
-# TradutorHub
+# Central PT-BR
 
 Aplicativo desktop para pesquisar traduções e instalá-las diretamente em jogos da Steam, sem abrir outro instalador.
 
@@ -18,15 +18,15 @@ Aplicativo desktop para pesquisar traduções e instalá-las diretamente em jogo
 - Atualiza o catálogo ao abrir e depois a cada 6 horas.
 - Trata operações especiais de pacote, como anexar um payload a um arquivo existente.
 
-O TradutorHub não executa arquivos `.exe`. O formato recomendado para cada projeto é um ou mais ZIPs com os arquivos da tradução e as regras de instalação no catálogo.
+A Central PT-BR não executa arquivos `.exe`. O formato recomendado para cada projeto é um ou mais ZIPs com os arquivos da tradução e as regras de instalação no catálogo.
 
 ## Como executar
 
-1. Dê duplo clique em `TradutorHub.bat`.
+1. Dê duplo clique em `Central PT-BR.exe`.
 2. O aplicativo já aponta para:
 
 ~~~text
-https://raw.githubusercontent.com/GabrielMichell/tradutor-hub-catalogo/main/catalog.json
+https://raw.githubusercontent.com/GabrielMichell/central-pt-br/main/catalog.json
 ~~~
 
 3. Digite o nome do jogo no campo de busca.
@@ -94,7 +94,7 @@ Para jogos que exigem uma operação especial, o catálogo aceita `operations` c
 Configurações, cache, pacotes baixados e backups ficam em:
 
 ~~~text
-%LOCALAPPDATA%\TradutorHub
+%LOCALAPPDATA%\Central PT-BR
 ~~~
 
 O catálogo completo e um modelo editável estão em `catalog.json` e `catalog.example.json`.
@@ -105,6 +105,10 @@ O catálogo completo e um modelo editável estão em `catalog.json` e `catalog.e
 - Cada pacote deve declarar SHA-256 para validação de integridade.
 - Os ZIPs são validados contra path traversal antes da extração.
 - O app não executa EXE, DLL, script ou outro programa vindo da release.
-- O backup é criado dentro da área local do TradutorHub antes da instalação.
+- O backup é criado dentro da área local da Central PT-BR antes da instalação.
+
+## Créditos
+
+Central PT-BR criada por Gabriel Michel e Fl4sh9174.
 - É necessário possuir uma cópia legítima do jogo e fechar o jogo antes de instalar.
 
