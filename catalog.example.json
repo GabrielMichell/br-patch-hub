@@ -8,18 +8,24 @@
       "game": "Nome do jogo",
       "language": "pt-BR",
       "version": "1.0.0",
-      "description": "Descrição curta da tradução.",
-      "downloadUrl": "https://github.com/SEU_USUARIO/SUA_REPO/releases/download/meu-jogo-1.0.0/meu-jogo-ptbr.zip",
-      "sha256": "COLE_AQUI_O_SHA256_DO_ZIP",
-      "executableHints": [
-        "Game.exe"
-      ],
-      "install": [
+      "packageType": "installer",
+      "description": "O app baixa os arquivos, valida os hashes e abre o instalador oficial.",
+      "releaseUrl": "https://github.com/SEU_USUARIO/SUA_REPO/releases/tag/v1.0.0",
+      "assets": [
         {
-          "from": "files",
-          "to": "game"
+          "role": "installer",
+          "fileName": "Meu-Jogo-PTBR-Instalador-v1.0.exe",
+          "downloadUrl": "https://github.com/SEU_USUARIO/SUA_REPO/releases/download/v1.0.0/Meu-Jogo-PTBR-Instalador-v1.0.exe",
+          "sha256": "COLE_AQUI_O_SHA256_DO_EXE"
+        },
+        {
+          "role": "dependency",
+          "fileName": "Meu-Jogo-PTBR-Dados-01.zip",
+          "downloadUrl": "https://github.com/SEU_USUARIO/SUA_REPO/releases/download/v1.0.0/Meu-Jogo-PTBR-Dados-01.zip",
+          "sha256": "COLE_AQUI_O_SHA256_DA_PARTE"
         }
       ]
     }
   ]
 }
+
