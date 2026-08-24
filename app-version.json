@@ -1,7 +1,7 @@
 {
-  "version": "2.0.3",
-  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.0.3",
-  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.0.3/Central-PT-BR.exe",
-  "sha256": "79d0314f50054987e7a98b4453d6256cb678fa8393deba19e7d36e241309d92d",
-  "notes": "Adiciona barra com progresso, porcentagem e tamanho durante a atualização automática da Central e corrige o ícone exibido na janela e na barra de tarefas do Windows."
+  "version": "2.0.4",
+  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.0.4",
+  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.0.4/Central-PT-BR.exe",
+  "sha256": "843758fc13f08d468bc4604617bdd702bd52951cfca4f6c97a1a56586eb01c77",
+  "notes": "Corrige definitivamente as bordas inferiores dos quatro cartões de informações usando faixas independentes que não podem ser cobertas pelo conteúdo ou pela escala de DPI."
 }
