@@ -1,7 +1,7 @@
 {
-  "version": "2.0.4",
-  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.0.4",
-  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.0.4/Central-PT-BR.exe",
-  "sha256": "843758fc13f08d468bc4604617bdd702bd52951cfca4f6c97a1a56586eb01c77",
-  "notes": "Corrige definitivamente as bordas inferiores dos quatro cartões de informações usando faixas independentes que não podem ser cobertas pelo conteúdo ou pela escala de DPI."
+  "version": "2.0.5",
+  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.0.5",
+  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.0.5/Central-PT-BR.exe",
+  "sha256": "33bb82fc448914ed94207cc40bbb25301bef0f5610c2abf3bc8703c10ee1a1cf",
+  "notes": "Adiciona a logo circular de Gabriel Michel ao lado da identidade da Central e mantém a correção estrutural das bordas inferiores dos cartões."
 }
