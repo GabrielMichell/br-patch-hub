@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>Central PT-BR</AssemblyName>
+    <Product>Central PT-BR</Product>
+    <Description>Central modular de traduções de jogos para Português Brasileiro</Description>
+    <Company>Gabriel Michel e Fl4sh9174</Company>
+    <Authors>Gabriel Michel; Fl4sh9174</Authors>
+    <Version>2.0.0</Version>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="logo.png" LogicalName="CentralPtBr.logo.png" />
+    <EmbeddedResource Include="ui-icons.png" LogicalName="CentralPtBr.ui-icons.png" />
+    <EmbeddedResource Include="status-icons.png" LogicalName="CentralPtBr.status-icons.png" />
+    <Content Include="catalog.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

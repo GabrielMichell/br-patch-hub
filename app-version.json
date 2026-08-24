@@ -1,7 +1,7 @@
 {
-  "version": "1.1.2",
-  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v1.1.2",
-  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v1.1.2/Central-PT-BR.exe",
-  "sha256": "8564a8305062d58aa3e10e05af0f1a05895319cfe198cf0214ad72f40e46ea63",
-  "notes": "Substitui a logo pela versão circular transparente e remove o fundo branco ao redor da imagem no cabeçalho."
+  "version": "2.0.0",
+  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.0.0",
+  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.0.0/Central-PT-BR.exe",
+  "sha256": "a8f47601ba1127f6a8de9bf57f89e00f6c24c974fa31b54e79bad8d7a250617a",
+  "notes": "Novo layout oficial da Central PT-BR, biblioteca visual, filtros, progresso de operações, verificação de traduções e atualização automática do aplicativo."
 }

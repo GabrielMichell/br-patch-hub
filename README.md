@@ -2,6 +2,8 @@
 
 Aplicativo desktop para pesquisar traduções e instalá-las diretamente em jogos da Steam, sem abrir outro instalador.
 
+Versão oficial atual: **v2.0.0**.
+
 ## O que esta base faz
 
 - Lê automaticamente o `catalog.json` público hospedado no GitHub.
@@ -15,7 +17,10 @@ Aplicativo desktop para pesquisar traduções e instalá-las diretamente em jogo
 - Faz backup dos arquivos originais antes de substituir.
 - Detecta conflito com arquivos pertencentes a outra tradução.
 - Permite atualizar e remover a tradução pelo próprio app.
-- Atualiza o catálogo ao abrir e depois a cada 6 horas.
+- Atualiza o catálogo automaticamente ao abrir.
+- Verifica atualizações da própria Central PT-BR, baixa o novo executável, valida o SHA-256 e reinicia o aplicativo.
+- Exibe biblioteca visual com capas, filtros, status e resumo das traduções.
+- Mostra o progresso de download, instalação, remoção e verificação sem congelar a interface.
 - Trata operações especiais de pacote, como anexar um payload a um arquivo existente.
 
 A Central PT-BR não executa arquivos `.exe`. O formato recomendado para cada projeto é um ou mais ZIPs com os arquivos da tradução e as regras de instalação no catálogo.
@@ -31,8 +36,8 @@ https://raw.githubusercontent.com/GabrielMichell/central-pt-br/main/catalog.json
 
 3. Digite o nome do jogo no campo de busca.
 4. Selecione a tradução encontrada.
-5. Clique em `Detectar Steam` ou escolha manualmente a pasta do jogo.
-6. Clique em `Instalar tradução`.
+5. Use `Escanear biblioteca` para localizar os jogos da Steam.
+6. Selecione o jogo e clique em `Instalar tradução`.
 
 ## Como cadastrar uma tradução ZIP
 
@@ -110,5 +115,6 @@ O catálogo completo e um modelo editável estão em `catalog.json` e `catalog.e
 ## Créditos
 
 Central PT-BR criada por Gabriel Michel e Fl4sh9174.
+
 - É necessário possuir uma cópia legítima do jogo e fechar o jogo antes de instalar.
 
