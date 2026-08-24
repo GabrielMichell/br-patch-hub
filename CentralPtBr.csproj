@@ -12,13 +12,14 @@
     <Description>Central modular de traduções de jogos para Português Brasileiro</Description>
     <Company>Gabriel Michel e Fl4sh9174</Company>
     <Authors>Gabriel Michel; Fl4sh9174</Authors>
-    <Version>2.0.1</Version>
+    <Version>2.0.2</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>central-pt-br.ico</ApplicationIcon>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="logo.png" LogicalName="CentralPtBr.logo.png" />
+    <EmbeddedResource Include="brand-header.png" LogicalName="CentralPtBr.logo.png" />
     <EmbeddedResource Include="ui-icons.png" LogicalName="CentralPtBr.ui-icons.png" />
     <EmbeddedResource Include="status-icons.png" LogicalName="CentralPtBr.status-icons.png" />
     <Content Include="catalog.json">

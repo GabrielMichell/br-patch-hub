@@ -6,6 +6,20 @@ namespace CentralPtBr;
 
 public static partial class SteamService
 {
+    public static bool IsRunning()
+    {
+        try
+        {
+            var processes = Process.GetProcessesByName("steam");
+            var running = processes.Length > 0;
+            foreach (var process in processes) process.Dispose();
+            return running;
+        }
+        catch { return false; }
+    }
+
+    public static void Start() => Process.Start(new ProcessStartInfo("steam://open/main") { UseShellExecute = true });
+
     public static string? FindGame(Translation translation)
     {
         foreach (var library in GetLibraries())

@@ -1,7 +1,7 @@
 {
-  "version": "2.0.1",
-  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.0.1",
-  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.0.1/Central-PT-BR.exe",
-  "sha256": "f4bf89b7956ac80eef0ed1417829a060e30fef2c8161a3b36e2daf5a6b37a7b0",
-  "notes": "Corrige definitivamente o posicionamento da borda inferior dos cartões de informações em diferentes escalas de DPI."
+  "version": "2.0.2",
+  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.0.2",
+  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.0.2/Central-PT-BR.exe",
+  "sha256": "b82d867839f48617fa1370f536a2b8525a63968ec6e8d486826ff7c35d1e67b9",
+  "notes": "Nova identidade visual da Central de Traduções PT-BR, ícone oficial no executável, contornos completos nos cartões e proteção que exige a Steam aberta nas operações de tradução."
 }
