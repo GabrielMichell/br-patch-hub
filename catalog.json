@@ -54,6 +54,7 @@
       "releaseUrl": "https://github.com/GabrielMichell/stories-untold-ptbr/releases/tag/v1.0.0",
       "steamAppId": "558420",
       "folderHints": ["Stories Untold"],
+      "executableHints": ["Stories Untold.exe"],
       "install": [
         { "from": "Stories Untold_Data", "to": "Stories Untold_Data" }
       ],
@@ -87,6 +88,7 @@
         "to": "English"
       },
       "folderHints": ["Lucius III"],
+      "executableHints": ["Lucius3.exe"],
       "install": [
         { "from": "Lucius3_Data", "to": "Lucius3_Data" }
       ],
@@ -143,6 +145,7 @@
       "releaseUrl": "https://github.com/GabrielMichell/the-survey-ptbr/releases/tag/v1.1",
       "steamAppId": "547910",
       "folderHints": ["The Survey"],
+      "executableHints": ["Visibility03.exe"],
       "install": [
         { "from": "Visibility03_Data", "to": "Visibility03_Data" }
       ],

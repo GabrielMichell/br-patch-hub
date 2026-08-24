@@ -18,6 +18,7 @@ public sealed class MainForm : Form
     private readonly Label _summaryCatalog = new(), _summaryInstalled = new(), _summaryUpdates = new(), _summaryAvailable = new(), _summaryMissing = new();
     private readonly Label _legendInstalled = new(), _legendAvailable = new(), _legendUpdates = new(), _legendMissing = new();
     private Image? _brandImage; private Image? _personalLogo; private Image? _iconSheet; private Image? _statusIconSheet; private SplitContainer? _bodySplit; private TableLayoutPanel? _detailRoot; private Panel? _operationPanel; private ProgressBar? _operationBar; private Label? _operationTitle; private Label? _operationDetail; private Label? _operationPercent; private bool _busy; private bool _searchHint;
+    private sealed record QueueChoice(Translation Translation, string Path) { public override string ToString() => $"{Translation.Game} | pt-BR | v{Translation.Version}"; }
 
     private sealed class IconView : Control
     {
@@ -65,7 +66,7 @@ public sealed class MainForm : Form
         var h = new TableLayoutPanel { Dock = DockStyle.Fill, BackColor = Bg, ColumnCount = 4, RowCount = 2 }; h.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 420)); h.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100)); h.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 195)); h.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 255)); h.RowStyles.Add(new RowStyle(SizeType.Absolute, 51)); h.RowStyles.Add(new RowStyle(SizeType.Absolute, 32));
         var logos = new TableLayoutPanel { Dock = DockStyle.Fill, BackColor = Bg, ColumnCount = 2, RowCount = 1, Margin = new Padding(0, 0, 18, 2) }; logos.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80)); logos.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100)); var personalLogo = new PictureBox { Dock = DockStyle.Fill, Image = _personalLogo, SizeMode = PictureBoxSizeMode.Zoom, Margin = new Padding(0, 2, 8, 2), BackColor = Bg }; var centralLogo = new PictureBox { Dock = DockStyle.Fill, Image = _brandImage, SizeMode = PictureBoxSizeMode.Zoom, Margin = new Padding(0), BackColor = Bg }; logos.Controls.Add(personalLogo, 0, 0); logos.Controls.Add(centralLogo, 1, 0); h.Controls.Add(logos, 0, 0); h.SetRowSpan(logos, 2);
         var title = LabelOf("Traduções de jogos para Português Brasileiro", 11, FontStyle.Bold, TextMain); title.TextAlign = ContentAlignment.BottomLeft; h.Controls.Add(title, 1, 0); var sub = LabelOf($"Central oficial • v{AppConstants.AppVersion}", 9, FontStyle.Regular, TextMuted); sub.TextAlign = ContentAlignment.TopLeft; h.Controls.Add(sub, 1, 1);
-        var scan = ButtonOf("Escanear biblioteca", false); scan.Click += async (_, _) => await ScanLibraryAsync(true); h.Controls.Add(scan, 2, 0); h.SetRowSpan(scan, 2); var settings = ButtonOf("Configurações", false); settings.Click += (_, _) => ShowSettings(); h.Controls.Add(settings, 3, 0);
+        var tools = new TableLayoutPanel { Dock = DockStyle.Fill, BackColor = Bg, ColumnCount = 1, RowCount = 2, Margin = new Padding(0) }; tools.RowStyles.Add(new RowStyle(SizeType.Percent, 50)); tools.RowStyles.Add(new RowStyle(SizeType.Percent, 50)); var queue = ButtonOf("Fila de instalações", false); queue.Margin = new Padding(3, 1, 3, 1); queue.Click += async (_, _) => await ShowInstallQueueAsync(); tools.Controls.Add(queue, 0, 0); var scan = ButtonOf("Escanear biblioteca", false); scan.Margin = new Padding(3, 1, 3, 1); scan.Click += async (_, _) => await ScanLibraryAsync(true); tools.Controls.Add(scan, 0, 1); h.Controls.Add(tools, 2, 0); h.SetRowSpan(tools, 2); var settings = ButtonOf("Configurações", false); settings.Click += (_, _) => ShowSettings(); h.Controls.Add(settings, 3, 0);
         var credits = LabelOf("Créditos: Gabriel Michel e Fl4sh9174", 8.5f, FontStyle.Bold, Color.FromArgb(255, 211, 105)); credits.TextAlign = ContentAlignment.BottomRight; credits.AutoEllipsis = false; credits.AutoSize = false; credits.Dock = DockStyle.Fill; h.Controls.Add(credits, 3, 1); return h;
     }
     private Control BuildLibrary()
@@ -178,7 +179,7 @@ public sealed class MainForm : Form
     }
     private Control BuildInformation(Translation item)
     {
-        var split = new TableLayoutPanel { Dock = DockStyle.Fill, BackColor = Bg, ColumnCount = 2, Padding = new Padding(0, 7, 0, 7) }; split.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 64)); split.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 36)); var about = Card(); about.Margin = new Padding(0, 0, 10, 0); about.Padding = new Padding(18, 14, 18, 14); var text = new Label { Dock = DockStyle.Fill, BackColor = Panel, ForeColor = TextMuted, Font = Font, Text = $"SOBRE ESTA TRADUÇÃO\r\n\r\n{item.Description}\r\n\r\nVersão {item.Version}\r\n• Pacote modular com instalação e backup automáticos\r\n• Verificação SHA-256 dos arquivos\r\n• Restauração segura dos arquivos originais", AutoEllipsis = true }; about.Controls.Add(text); var links = new FlowLayoutPanel { Dock = DockStyle.Bottom, Height = 38, BackColor = Panel }; links.Controls.Add(LinkOf("Ver no GitHub", item.ReleaseUrl)); links.Controls.Add(LinkOf("Reportar problema", IssueUrl(item))); about.Controls.Add(links); split.Controls.Add(about, 0, 0);
+        var split = new TableLayoutPanel { Dock = DockStyle.Fill, BackColor = Bg, ColumnCount = 2, Padding = new Padding(0, 7, 0, 7) }; split.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 64)); split.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 36)); var about = Card(); about.Margin = new Padding(0, 0, 10, 0); about.Padding = new Padding(18, 14, 18, 14); var text = new Label { Dock = DockStyle.Fill, BackColor = Panel, ForeColor = TextMuted, Font = Font, Text = $"SOBRE ESTA TRADUÇÃO\r\n\r\n{item.Description}\r\n\r\nVersão {item.Version}\r\n• Pacote modular com instalação e backup automáticos\r\n• Verificação SHA-256 dos arquivos\r\n• Restauração segura dos arquivos originais", AutoEllipsis = true }; about.Controls.Add(text); var links = new FlowLayoutPanel { Dock = DockStyle.Bottom, Height = 38, BackColor = Panel }; links.Controls.Add(LinkOf("Ver no GitHub", item.ReleaseUrl)); var report = LinkOf("Reportar problema", ""); report.LinkClicked += (_, _) => ShowReportDialog(item); links.Controls.Add(report); about.Controls.Add(links); split.Controls.Add(about, 0, 0);
         var info = Card(); info.Padding = new Padding(18, 14, 18, 14); var table = new TableLayoutPanel { Dock = DockStyle.Fill, BackColor = Panel, ColumnCount = 2, RowCount = 6 }; table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 58)); table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 42)); var heading = LabelOf("INFORMAÇÕES", 10, FontStyle.Bold, TextMain); table.Controls.Add(heading, 0, 0); table.SetColumnSpan(heading, 2); var packageSize = _storage.Installed.TryGetValue(item.Id, out var installed) ? installed.Files.Sum(x => x.InstalledSize) : 0; AddInfo(table, 1, "Arquivos traduzidos:", installed?.Files.Count.ToString() ?? "—"); AddInfo(table, 2, "Tamanho da tradução:", packageSize > 0 ? FormatBytes(packageSize) : "—"); AddInfo(table, 3, "Tipo de tradução:", "Instalação interna"); AddInfo(table, 4, "Backup:", "Ativado / OK"); AddInfo(table, 5, "Status:", StateText(StateOf(item))); info.Controls.Add(table); split.Controls.Add(info, 1, 0); return split;
     }
     private Control BuildSummary()
@@ -190,18 +191,18 @@ public sealed class MainForm : Form
 
     private async Task InstallAsync(Translation item)
     {
-        var path = _foundPaths.GetValueOrDefault(item.Id) ?? _storage.Config.GamePaths.GetValueOrDefault(item.Id); if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) { MessageBox.Show(this, "O jogo não foi localizado. Execute o escaneamento.", "Jogo não encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; } if (!EnsureSteamRunning()) return; if (MessageBox.Show(this, $"Instalar a tradução de {item.Game}?", "Confirmar instalação", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+        var path = _foundPaths.GetValueOrDefault(item.Id) ?? _storage.Config.GamePaths.GetValueOrDefault(item.Id); if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) { MessageBox.Show(this, "O jogo não foi localizado. Execute o escaneamento.", "Jogo não encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; } if (!EnsureSteamRunning()) return; if (MessageBox.Show(this, $"Instalar a tradução de {item.Game}?", "Confirmar instalação", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return; if (!EnsureGameClosed(item, path)) return;
         try { SetBusy(true, "Instalando tradução"); await _translations.InstallAsync(item, path, new Progress<ProgressInfo>(UpdateOperation), _closing.Token); MessageBox.Show(this, "Tradução instalada com sucesso.", "Central PT-BR", MessageBoxButtons.OK, MessageBoxIcon.Information); } catch (Exception ex) { Log(ex.Message); MessageBox.Show(this, ex.Message, "Falha na instalação", MessageBoxButtons.OK, MessageBoxIcon.Error); } finally { SetBusy(false); EnsureStates(); RefreshGameList(); ShowDetails(item); }
     }
     private async Task RemoveAsync(Translation item)
     {
-        if (!EnsureSteamRunning()) return; if (MessageBox.Show(this, "Desinstalar a tradução e restaurar o backup original?", "Confirmar remoção", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return; try { SetBusy(true, "Removendo tradução"); var result = await _translations.RemoveAsync(item, new Progress<ProgressInfo>(UpdateOperation), _closing.Token); var note = result.RequiresSteamRestore ? " Alguns arquivos precisarão da verificação da Steam." : ""; MessageBox.Show(this, "Tradução removida com sucesso." + note, "Central PT-BR", MessageBoxButtons.OK, MessageBoxIcon.Information); } catch (Exception ex) { Log(ex.Message); MessageBox.Show(this, ex.Message, "Falha na remoção", MessageBoxButtons.OK, MessageBoxIcon.Error); } finally { SetBusy(false); EnsureStates(); RefreshGameList(); ShowDetails(item); }
+        if (!EnsureSteamRunning()) return; if (MessageBox.Show(this, "Desinstalar a tradução e restaurar o backup original?", "Confirmar remoção", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return; var gamePath = _storage.Installed.GetValueOrDefault(item.Id)?.GamePath ?? _storage.Config.GamePaths.GetValueOrDefault(item.Id); if (!EnsureGameClosed(item, gamePath)) return; try { SetBusy(true, "Removendo tradução"); var result = await _translations.RemoveAsync(item, new Progress<ProgressInfo>(UpdateOperation), _closing.Token); var note = result.RequiresSteamRestore ? " Alguns arquivos precisarão da verificação da Steam." : ""; MessageBox.Show(this, "Tradução removida com sucesso." + note, "Central PT-BR", MessageBoxButtons.OK, MessageBoxIcon.Information); } catch (Exception ex) { Log(ex.Message); MessageBox.Show(this, ex.Message, "Falha na remoção", MessageBoxButtons.OK, MessageBoxIcon.Error); } finally { SetBusy(false); EnsureStates(); RefreshGameList(); ShowDetails(item); }
     }
     private async Task VerifyAsync(Translation item)
     {
         if (!_storage.Installed.TryGetValue(item.Id, out var installed)) { MessageBox.Show(this, "Esta tradução ainda não está instalada.", "Verificação", MessageBoxButtons.OK, MessageBoxIcon.Information); return; } SetBusy(true, "Verificando arquivos"); var problems = 0; IProgress<ProgressInfo> progress = new Progress<ProgressInfo>(UpdateOperation); try { await Task.Run(async () => { for (var i = 0; i < installed.Files.Count; i++) { var file = installed.Files[i]; var path = Path.Combine(installed.GamePath, file.RelativePath); if (!File.Exists(path) || !string.Equals(await FileTools.Sha256Async(path), file.InstalledHash, StringComparison.OrdinalIgnoreCase)) problems++; progress.Report(new ProgressInfo($"Verificando arquivo {i + 1} de {installed.Files.Count}", (i + 1) * 100 / Math.Max(1, installed.Files.Count))); } }); } finally { SetBusy(false); } MessageBox.Show(this, problems == 0 ? "Todos os arquivos estão corretos." : $"Foram encontrados {problems} arquivo(s) alterado(s) ou ausente(s).", "Verificação concluída", MessageBoxButtons.OK, problems == 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
     }
-    private void RestoreSteam(Translation item) { if (!EnsureSteamRunning()) return; if (MessageBox.Show(this, "A Steam verificará e restaurará os arquivos originais. Continuar?", "Restaurar jogo original", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return; try { SteamService.Validate(item.SteamAppId); } catch (Exception ex) { MessageBox.Show(this, ex.Message, "Steam", MessageBoxButtons.OK, MessageBoxIcon.Error); } }
+    private void RestoreSteam(Translation item) { if (!EnsureSteamRunning()) return; if (MessageBox.Show(this, "A Steam verificará e restaurará os arquivos originais. Continuar?", "Restaurar jogo original", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return; var path = _foundPaths.GetValueOrDefault(item.Id) ?? _storage.Config.GamePaths.GetValueOrDefault(item.Id); if (!EnsureGameClosed(item, path)) return; try { SteamService.Validate(item.SteamAppId); } catch (Exception ex) { MessageBox.Show(this, ex.Message, "Steam", MessageBoxButtons.OK, MessageBoxIcon.Error); } }
     private bool EnsureSteamRunning()
     {
         if (SteamService.IsRunning()) return true;
@@ -213,6 +214,85 @@ public sealed class MainForm : Form
         buttons.Controls.Add(cancel); buttons.Controls.Add(open); dialog.Controls.Add(text); dialog.Controls.Add(buttons); dialog.AcceptButton = open; dialog.CancelButton = cancel;
         if (dialog.ShowDialog(this) == DialogResult.OK) { try { SteamService.Start(); } catch (Exception ex) { MessageBox.Show(this, ex.Message, "Steam", MessageBoxButtons.OK, MessageBoxIcon.Error); } }
         return false;
+    }
+    private bool EnsureGameClosed(Translation item, string? gamePath)
+    {
+        while (true)
+        {
+            var running = GameProcessService.FindRunning(item, gamePath);
+            if (running is null) return true;
+            using var dialog = new Form { Text = "Jogo em execução", StartPosition = FormStartPosition.CenterParent, ClientSize = new Size(510, 218), BackColor = Panel, ForeColor = TextMain, Font = Font, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false, ShowInTaskbar = false };
+            var text = new Label { Dock = DockStyle.Fill, Padding = new Padding(22, 20, 22, 8), ForeColor = TextMain, BackColor = Panel, Font = new Font("Segoe UI", 10), Text = $"Feche o jogo para continuar.\r\n\r\nProcesso encontrado: {running}\r\n\r\nA Central nunca fechará o jogo à força." };
+            var buttons = new FlowLayoutPanel { Dock = DockStyle.Bottom, Height = 62, FlowDirection = FlowDirection.RightToLeft, Padding = new Padding(12, 8, 18, 10), BackColor = Panel };
+            var cancel = ButtonOf("Cancelar", false); cancel.Size = new Size(120, 38); cancel.Dock = DockStyle.None; cancel.DialogResult = DialogResult.Cancel;
+            var retry = ButtonOf("Verificar novamente", true); retry.Size = new Size(170, 38); retry.Dock = DockStyle.None; retry.DialogResult = DialogResult.Retry;
+            buttons.Controls.Add(cancel); buttons.Controls.Add(retry); dialog.Controls.Add(text); dialog.Controls.Add(buttons); dialog.AcceptButton = retry; dialog.CancelButton = cancel;
+            if (dialog.ShowDialog(this) != DialogResult.Retry) return false;
+        }
+    }
+    private async Task ShowInstallQueueAsync()
+    {
+        if (_busy) return;
+        EnsureStates();
+        var choices = _catalog.Translations.Where(x => StateOf(x) is LibraryState.Available or LibraryState.UpdateAvailable).Select(x => new QueueChoice(x, _foundPaths.GetValueOrDefault(x.Id) ?? _storage.Config.GamePaths.GetValueOrDefault(x.Id) ?? "")).Where(x => Directory.Exists(x.Path)).ToList();
+        if (choices.Count == 0) { MessageBox.Show(this, "Não há traduções disponíveis para instalar ou atualizar nos jogos encontrados.", "Fila de instalações", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
+        using var select = new Form { Text = "Fila de instalações", StartPosition = FormStartPosition.CenterParent, ClientSize = new Size(590, 430), BackColor = Panel, ForeColor = TextMain, Font = Font, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false, ShowInTaskbar = false };
+        var instruction = new Label { Dock = DockStyle.Top, Height = 58, Padding = new Padding(16, 15, 16, 4), Text = "Marque as traduções que deseja instalar ou atualizar:", ForeColor = TextMain, BackColor = Panel };
+        var list = new CheckedListBox { Dock = DockStyle.Fill, BackColor = Bg, ForeColor = TextMain, BorderStyle = BorderStyle.FixedSingle, CheckOnClick = true, Font = new Font("Segoe UI", 10), IntegralHeight = false };
+        foreach (var choice in choices) list.Items.Add(choice, true);
+        var buttons = new FlowLayoutPanel { Dock = DockStyle.Bottom, Height = 62, FlowDirection = FlowDirection.RightToLeft, Padding = new Padding(12, 8, 18, 10), BackColor = Panel };
+        var cancel = ButtonOf("Cancelar", false); cancel.Size = new Size(120, 38); cancel.Dock = DockStyle.None; cancel.DialogResult = DialogResult.Cancel;
+        var start = ButtonOf("Iniciar fila", true); start.Size = new Size(140, 38); start.Dock = DockStyle.None; start.DialogResult = DialogResult.OK;
+        buttons.Controls.Add(cancel); buttons.Controls.Add(start); select.Controls.Add(list); select.Controls.Add(instruction); select.Controls.Add(buttons); select.AcceptButton = start; select.CancelButton = cancel;
+        if (select.ShowDialog(this) != DialogResult.OK) return;
+        var selected = list.CheckedItems.Cast<QueueChoice>().ToList(); if (selected.Count == 0) return; if (!EnsureSteamRunning()) return;
+
+        using var progressForm = new Form { Text = "Fila de instalações", StartPosition = FormStartPosition.CenterParent, ClientSize = new Size(650, 390), BackColor = Panel, ForeColor = TextMain, Font = Font, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false, ShowInTaskbar = false, ControlBox = false };
+        var status = new Label { Dock = DockStyle.Top, Height = 66, Padding = new Padding(18, 14, 18, 5), ForeColor = TextMain, BackColor = Panel, Text = "Preparando fila..." };
+        var overall = new ProgressBar { Dock = DockStyle.Top, Height = 24, Minimum = 0, Maximum = 100, Style = ProgressBarStyle.Continuous, Margin = new Padding(18) };
+        var results = new ListBox { Dock = DockStyle.Fill, BackColor = Bg, ForeColor = TextMain, BorderStyle = BorderStyle.FixedSingle, Font = new Font("Segoe UI", 9.5f) };
+        var stop = false; var stopButton = ButtonOf("Cancelar pendentes", false); stopButton.Dock = DockStyle.Bottom; stopButton.Height = 48; stopButton.Click += (_, _) => { stop = true; stopButton.Enabled = false; stopButton.Text = "A fila será interrompida após o item atual"; };
+        progressForm.Controls.Add(results); progressForm.Controls.Add(overall); progressForm.Controls.Add(status); progressForm.Controls.Add(stopButton); progressForm.Show(this); progressForm.Refresh();
+        var ok = 0; var failed = 0; var skipped = 0; _busy = true;
+        try
+        {
+            for (var index = 0; index < selected.Count; index++)
+            {
+                if (stop) { skipped += selected.Count - index; break; }
+                var choice = selected[index]; status.Text = $"Item {index + 1} de {selected.Count}: {choice.Translation.Game}"; results.Items.Add($"Aguardando: {choice.Translation.Game}");
+                if (!EnsureGameClosed(choice.Translation, choice.Path)) { results.Items[results.Items.Count - 1] = $"Ignorada: {choice.Translation.Game} (jogo aberto)"; skipped++; continue; }
+                try
+                {
+                    var itemProgress = new Progress<ProgressInfo>(info => { status.Text = $"Item {index + 1} de {selected.Count}: {info.Message}"; var part = info.Percent ?? 0; overall.Value = Math.Clamp((index * 100 + part) / selected.Count, 0, 100); });
+                    await _translations.InstallAsync(choice.Translation, choice.Path, itemProgress, _closing.Token); ok++; results.Items[results.Items.Count - 1] = $"Concluída: {choice.Translation.Game}";
+                }
+                catch (Exception ex) { failed++; Log($"Fila - {choice.Translation.Game}: {ex.Message}"); results.Items[results.Items.Count - 1] = $"Falhou: {choice.Translation.Game} — {ex.Message}"; }
+                overall.Value = Math.Clamp((index + 1) * 100 / selected.Count, 0, 100); results.TopIndex = Math.Max(0, results.Items.Count - 1); Application.DoEvents();
+            }
+        }
+        finally { _busy = false; progressForm.Close(); EnsureStates(); RefreshGameList(); if (_selected is not null) ShowDetails(_selected); }
+        MessageBox.Show(this, $"Fila concluída.\r\n\r\nConcluídas: {ok}\r\nFalhas: {failed}\r\nPendentes canceladas/ignoradas: {skipped}", "Fila de instalações", MessageBoxButtons.OK, failed == 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+    }
+    private void ShowReportDialog(Translation item)
+    {
+        var state = StateText(StateOf(item)); var logLines = _log.Lines.Where(x => !string.IsNullOrWhiteSpace(x)).TakeLast(35);
+        var body = $"Descrição do problema:\r\n[Conte aqui o que aconteceu]\r\n\r\n--- Diagnóstico da Central PT-BR ---\r\nCentral: v{AppConstants.AppVersion}\r\nWindows: {Environment.OSVersion}\r\nJogo: {item.Game}\r\nTradução: v{item.Version}\r\nEstado: {state}\r\nSteam AppID: {item.SteamAppId}\r\nData: {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zzz}\r\n\r\nLog recente:\r\n{string.Join("\r\n", logLines)}";
+        body = SanitizeReport(body, item);
+        using var dialog = new Form { Text = "Prévia do relatório", StartPosition = FormStartPosition.CenterParent, ClientSize = new Size(760, 610), BackColor = Panel, ForeColor = TextMain, Font = Font, FormBorderStyle = FormBorderStyle.Sizable, MinimizeBox = false, ShowInTaskbar = false };
+        var notice = new Label { Dock = DockStyle.Top, Height = 70, Padding = new Padding(16, 12, 16, 5), ForeColor = TextMain, BackColor = Panel, Text = "Revise o relatório antes de continuar. Caminhos pessoais foram ocultados. Nada será enviado automaticamente; o GitHub abrirá a página para sua confirmação final." };
+        var preview = new TextBox { Dock = DockStyle.Fill, Multiline = true, ScrollBars = ScrollBars.Both, WordWrap = false, BackColor = Bg, ForeColor = TextMain, BorderStyle = BorderStyle.FixedSingle, Font = new Font("Consolas", 9.5f), Text = body };
+        var buttons = new FlowLayoutPanel { Dock = DockStyle.Bottom, Height = 62, FlowDirection = FlowDirection.RightToLeft, Padding = new Padding(12, 8, 18, 10), BackColor = Panel };
+        var cancel = ButtonOf("Cancelar", false); cancel.Size = new Size(110, 38); cancel.Dock = DockStyle.None; cancel.DialogResult = DialogResult.Cancel;
+        var open = ButtonOf("Abrir issue no GitHub", true); open.Size = new Size(180, 38); open.Dock = DockStyle.None; open.DialogResult = DialogResult.OK;
+        var copy = ButtonOf("Copiar relatório", false); copy.Size = new Size(145, 38); copy.Dock = DockStyle.None; copy.Click += (_, _) => { Clipboard.SetText(preview.Text); MessageBox.Show(dialog, "Relatório copiado.", "Central PT-BR", MessageBoxButtons.OK, MessageBoxIcon.Information); };
+        buttons.Controls.Add(cancel); buttons.Controls.Add(open); buttons.Controls.Add(copy); dialog.Controls.Add(preview); dialog.Controls.Add(notice); dialog.Controls.Add(buttons); dialog.AcceptButton = open; dialog.CancelButton = cancel;
+        if (dialog.ShowDialog(this) == DialogResult.OK) { var title = Uri.EscapeDataString($"[Central PT-BR] Problema com {item.Game}"); var reportBody = Uri.EscapeDataString(SanitizeReport(preview.Text, item)); OpenUrl($"{IssueUrl(item)}?title={title}&body={reportBody}"); }
+    }
+    private string SanitizeReport(string text, Translation item)
+    {
+        var values = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase) { ["%USERPROFILE%"] = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ["%CENTRAL_DATA%"] = _storage.Root, ["%GAME_FOLDER%"] = _storage.Installed.GetValueOrDefault(item.Id)?.GamePath ?? _foundPaths.GetValueOrDefault(item.Id) ?? _storage.Config.GamePaths.GetValueOrDefault(item.Id) };
+        foreach (var pair in values.Where(x => !string.IsNullOrWhiteSpace(x.Value)).OrderByDescending(x => x.Value!.Length)) text = text.Replace(pair.Value!, pair.Key, StringComparison.OrdinalIgnoreCase);
+        return text.Length > 6000 ? text[..6000] + "\r\n[log reduzido]" : text;
     }
     private void ShowSettings()
     {
