@@ -12,7 +12,7 @@
     <Description>Central modular de traduções de jogos para Português Brasileiro</Description>
     <Company>Gabriel Michel e Fl4sh9174</Company>
     <Authors>Gabriel Michel; Fl4sh9174</Authors>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
   </PropertyGroup>

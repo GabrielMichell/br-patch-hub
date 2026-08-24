@@ -1,7 +1,7 @@
 {
-  "version": "2.0.0",
-  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.0.0",
-  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.0.0/Central-PT-BR.exe",
-  "sha256": "a8f47601ba1127f6a8de9bf57f89e00f6c24c974fa31b54e79bad8d7a250617a",
-  "notes": "Novo layout oficial da Central PT-BR, biblioteca visual, filtros, progresso de operações, verificação de traduções e atualização automática do aplicativo."
+  "version": "2.0.1",
+  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.0.1",
+  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.0.1/Central-PT-BR.exe",
+  "sha256": "f4bf89b7956ac80eef0ed1417829a060e30fef2c8161a3b36e2daf5a6b37a7b0",
+  "notes": "Corrige definitivamente o posicionamento da borda inferior dos cartões de informações em diferentes escalas de DPI."
 }
