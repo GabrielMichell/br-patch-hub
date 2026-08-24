@@ -68,7 +68,9 @@ public sealed class OnlineServices
                 if (count == 0) break;
                 await output.WriteAsync(buffer.AsMemory(0, count), cancellationToken);
                 downloaded += count;
-                progress?.Report(new ProgressInfo($"Baixando atualização — {downloaded / (1024d * 1024):0.0} MB", total.HasValue ? (int)(downloaded * 100 / total.Value) : null));
+                var downloadedMb = downloaded / (1024d * 1024);
+                var message = total.HasValue ? $"Baixando atualização — {downloadedMb:0.0} de {total.Value / (1024d * 1024):0.0} MB" : $"Baixando atualização — {downloadedMb:0.0} MB";
+                progress?.Report(new ProgressInfo(message, total.HasValue ? (int)(downloaded * 100 / total.Value) : null));
             }
         }
         var hash = await FileTools.Sha256Async(temporary, cancellationToken);

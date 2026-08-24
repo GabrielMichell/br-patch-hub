@@ -2,9 +2,13 @@ namespace CentralPtBr;
 
 static class Program
 {
+    [System.Runtime.InteropServices.DllImport("shell32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+    private static extern int SetCurrentProcessExplicitAppUserModelID(string appId);
+
     [STAThread]
     static int Main(string[] args)
     {
+        SetCurrentProcessExplicitAppUserModelID("GabrielMichell.CentralPTBR");
         if (args.Length == 5 && args[0].Equals("--apply-update", StringComparison.OrdinalIgnoreCase))
         {
             ApplicationConfiguration.Initialize();

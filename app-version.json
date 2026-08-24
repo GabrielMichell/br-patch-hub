@@ -1,7 +1,7 @@
 {
-  "version": "2.0.2",
-  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.0.2",
-  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.0.2/Central-PT-BR.exe",
-  "sha256": "b82d867839f48617fa1370f536a2b8525a63968ec6e8d486826ff7c35d1e67b9",
-  "notes": "Nova identidade visual da Central de Traduções PT-BR, ícone oficial no executável, contornos completos nos cartões e proteção que exige a Steam aberta nas operações de tradução."
+  "version": "2.0.3",
+  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.0.3",
+  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.0.3/Central-PT-BR.exe",
+  "sha256": "79d0314f50054987e7a98b4453d6256cb678fa8393deba19e7d36e241309d92d",
+  "notes": "Adiciona barra com progresso, porcentagem e tamanho durante a atualização automática da Central e corrige o ícone exibido na janela e na barra de tarefas do Windows."
 }
