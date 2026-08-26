@@ -1,7 +1,7 @@
 {
-  "version": "2.1.1",
-  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.1.1",
-  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.1.1/Central-PT-BR.exe",
-  "sha256": "5d48730c020975d4887377e7389af4a221637a27e76ff31d64897616de33a219",
-  "notes": "Corrige jogos desinstalados que ainda apareciam como tradução instalada, preenche as capas removendo bordas pretas e mantém todo o rodapé visível em diferentes resoluções."
+  "version": "2.2.0",
+  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.2.0",
+  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.2.0/Central-PT-BR.exe",
+  "sha256": "a3828922ff4edcfc95a979480e5da60a1825549df33aba923f650baa7c234f03",
+  "notes": "Nova experiência de gerenciamento: localização manual validada do jogo, estados e botões mais claros, cabeçalho reorganizado e ícones visuais padronizados."
 }
