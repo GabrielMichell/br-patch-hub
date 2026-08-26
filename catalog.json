@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "catalogName": "Catálogo de traduções PT-BR",
-  "updatedAt": "2026-08-26T15:25:43Z",
+  "updatedAt": "2026-08-26T15:45:01Z",
   "translations": [
     {
       "id": "lucius-ii-ptbr",
@@ -178,6 +178,29 @@
           "fileName": "Lucius-PTBR-v1.0.0.zip",
           "downloadUrl": "https://github.com/GabrielMichell/lucius-ptbr/releases/download/v1.0.0/Lucius-PTBR-v1.0.0.zip",
           "sha256": "83ac288a166265415b6c6173d35fb2542f649b7a54a517b1fc36952de23e134c"
+        }
+      ]
+    },
+    {
+      "id": "alice-madness-returns-ptbr",
+      "game": "Alice: Madness Returns",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "packageType": "zip",
+      "description": "Tradução PT-BR com menus, opções, avisos, textos de jogo e legendas de diálogos; inclui os pacotes de localização CookedPC necessários para as legendas e a fonte com suporte aos caracteres acentuados.",
+      "releaseUrl": "https://github.com/GabrielMichell/alice-madness-returns-ptbr/releases/tag/v1.0.0",
+      "steamAppId": "19680",
+      "folderHints": ["Alice Madness Returns"],
+      "executableHints": ["AliceMadnessReturns.exe"],
+      "install": [
+        { "from": "AliceGame", "to": "game" }
+      ],
+      "assets": [
+        {
+          "role": "package",
+          "fileName": "Alice-Madness-Returns-PTBR-v1.0.0.zip",
+          "downloadUrl": "https://github.com/GabrielMichell/alice-madness-returns-ptbr/releases/download/v1.0.0/Alice-Madness-Returns-PTBR-v1.0.0.zip",
+          "sha256": "180217cb1a82882e6db7fd1f5192b6cd9402864176437b3daa6a26d81128ef91"
         }
       ]
     }
