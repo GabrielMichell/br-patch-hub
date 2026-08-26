@@ -81,7 +81,7 @@ public sealed record RemovalResult(bool RequiresSteamRestore, int CleanedFiles, 
 public static class AppConstants
 {
     public const string AppName = "Central PT-BR";
-    public const string AppVersion = "2.2.1";
+    public const string AppVersion = "2.2.2";
     public const string OfficialRepositoryUrl = "https://github.com/GabrielMichell/central-pt-br";
     public const string CatalogUrl = "https://raw.githubusercontent.com/GabrielMichell/central-pt-br/main/catalog.json";
     public const string VersionUrl = "https://raw.githubusercontent.com/GabrielMichell/central-pt-br/main/app-version.json";

@@ -1,7 +1,7 @@
 {
-  "version": "2.2.1",
-  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.2.1",
-  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.2.1/Central-PT-BR.exe",
-  "sha256": "137a005b1a4594e56f7e066804551b918c21c20b3a5d767735bd18d78f9293e0",
-  "notes": "Ajusta a capa do jogo para exibição completa, restaura os ícones coloridos anteriores e simplifica o estado de jogo ausente para Não instalado."
+  "version": "2.2.2",
+  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.2.2",
+  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.2.2/Central-PT-BR.exe",
+  "sha256": "770bc75ec384c3b79a954e148de4daa68e4bda5d21aeb80755eaa6b216a1a20b",
+  "notes": "Padroniza o enquadramento das capas sem cortes, remove bordas pretas externas e adiciona um ícone de pasta colorido ao estado Não instalado."
 }
