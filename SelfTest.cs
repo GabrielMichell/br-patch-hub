@@ -6,12 +6,12 @@ namespace CentralPtBr;
 
 public static class SelfTest
 {
-    public static int Render(string output)
+    public static int Render(string output, int width = 1520, int height = 940)
     {
         var root = Path.Combine(Path.GetTempPath(), $"central-ptbr-render-{Guid.NewGuid():N}");
         try
         {
-            using var form = new MainForm(new Storage(root), false) { Size = new Size(1520, 940), Opacity = 0 };
+            using var form = new MainForm(new Storage(root), false) { Size = new Size(width, height), Opacity = 0 };
             form.Show();
             Application.DoEvents();
             using var bitmap = new Bitmap(form.Width, form.Height);
@@ -88,6 +88,7 @@ public static class SelfTest
             {
                 var catalog = JsonSerializer.Deserialize<Catalog>(File.ReadAllText(catalogPath), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 if (catalog is null || catalog.SchemaVersion < 1 || catalog.Translations.Count == 0) throw new Exception("Catálogo embarcado inválido.");
+                var staleStorage = new Storage(Path.Combine(root, "stale-state")); var stale = catalog.Translations[0]; staleStorage.Installed[stale.Id] = new InstalledTranslation { Id = stale.Id, Game = stale.Game, Version = stale.Version, GamePath = Path.Combine(root, "jogo-removido") }; staleStorage.Config.GamePaths[stale.Id] = Path.Combine(root, "jogo-removido"); staleStorage.SaveInstalled(); staleStorage.SaveConfig(); using var staleForm = new MainForm(staleStorage, false); var reconcile = typeof(MainForm).GetMethod("ReconcileUninstalledGames", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic) ?? throw new Exception("Rotina de reconciliação ausente."); reconcile.Invoke(staleForm, null); if (staleStorage.Installed.ContainsKey(stale.Id) || staleStorage.Config.GamePaths.ContainsKey(stale.Id)) throw new Exception("Registro de jogo desinstalado não foi limpo.");
             }
             using var form = new MainForm(new Storage(Path.Combine(root, "ui-state")));
             form.CreateControl();

@@ -1,7 +1,7 @@
 {
-  "version": "2.1.0",
-  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.1.0",
-  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.1.0/Central-PT-BR.exe",
-  "sha256": "738995ab8038c4f7eb8d66801aa81aafdff54194e0deb0911c9a22adb9b53e18",
-  "notes": "Adiciona detecção segura de jogo em execução, fila para instalar ou atualizar várias traduções e relatório de erro com prévia e remoção de caminhos pessoais."
+  "version": "2.1.1",
+  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.1.1",
+  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.1.1/Central-PT-BR.exe",
+  "sha256": "5d48730c020975d4887377e7389af4a221637a27e76ff31d64897616de33a219",
+  "notes": "Corrige jogos desinstalados que ainda apareciam como tradução instalada, preenche as capas removendo bordas pretas e mantém todo o rodapé visível em diferentes resoluções."
 }

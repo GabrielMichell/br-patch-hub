@@ -36,6 +36,7 @@ public static partial class SteamService
                         if (Directory.Exists(candidate)) return candidate;
                     }
                 }
+                continue;
             }
             foreach (var hint in translation.FolderHints)
             {

@@ -20,6 +20,11 @@ static class Program
             ApplicationConfiguration.Initialize();
             return SelfTest.Render(args[1]);
         }
+        if (args.Length == 4 && args[0].Equals("--render-test", StringComparison.OrdinalIgnoreCase))
+        {
+            ApplicationConfiguration.Initialize();
+            return SelfTest.Render(args[1], int.Parse(args[2]), int.Parse(args[3]));
+        }
         ApplicationConfiguration.Initialize();
         Application.Run(new MainForm());
         return 0;
