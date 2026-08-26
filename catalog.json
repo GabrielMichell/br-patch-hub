@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "catalogName": "Catálogo de traduções PT-BR",
-  "updatedAt": "2026-08-23T00:00:00Z",
+  "updatedAt": "2026-08-26T15:25:43Z",
   "translations": [
     {
       "id": "lucius-ii-ptbr",
@@ -155,6 +155,29 @@
           "fileName": "Traducao-PTBR-The-Survey-v1.1.zip",
           "downloadUrl": "https://github.com/GabrielMichell/the-survey-ptbr/releases/download/v1.1/Traducao-PTBR-The-Survey-v1.1.zip",
           "sha256": "19d933878ec1f3c6d70c2606c58a08ae8da693b959d93ea0981bfaf7eee3fa17"
+        }
+      ]
+    },
+    {
+      "id": "lucius-ptbr",
+      "game": "Lucius",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "packageType": "zip",
+      "description": "Tradução PT-BR de Lucius, com 26 arquivos de textos e localização traduzidos.",
+      "releaseUrl": "https://github.com/GabrielMichell/lucius-ptbr/releases/tag/v1.0.0",
+      "steamAppId": "218640",
+      "folderHints": ["Lucius"],
+      "executableHints": ["Lucius.exe"],
+      "install": [
+        { "from": ".", "to": "game" }
+      ],
+      "assets": [
+        {
+          "role": "package",
+          "fileName": "Lucius-PTBR-v1.0.0.zip",
+          "downloadUrl": "https://github.com/GabrielMichell/lucius-ptbr/releases/download/v1.0.0/Lucius-PTBR-v1.0.0.zip",
+          "sha256": "83ac288a166265415b6c6173d35fb2542f649b7a54a517b1fc36952de23e134c"
         }
       ]
     }
