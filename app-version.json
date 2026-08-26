@@ -1,7 +1,7 @@
 {
-  "version": "2.2.2",
-  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.2.2",
-  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.2.2/Central-PT-BR.exe",
-  "sha256": "770bc75ec384c3b79a954e148de4daa68e4bda5d21aeb80755eaa6b216a1a20b",
-  "notes": "Padroniza o enquadramento das capas sem cortes, remove bordas pretas externas e adiciona um ícone de pasta colorido ao estado Não instalado."
+  "version": "2.2.3",
+  "releaseUrl": "https://github.com/GabrielMichell/central-pt-br/releases/tag/v2.2.3",
+  "downloadUrl": "https://github.com/GabrielMichell/central-pt-br/releases/download/v2.2.3/Central-PT-BR.exe",
+  "sha256": "5d0ea90f138b7cd446d421259542b615a3d175ced0279a59e905ef89b612bea5",
+  "notes": "Aumenta as capas dos jogos e padroniza todas em um quadro fixo de mesma proporção na biblioteca e no cabeçalho."
 }
