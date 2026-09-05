@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "catalogName": "Catálogo do BR Patch Hub",
-  "updatedAt": "2026-08-26T15:45:01Z",
+  "updatedAt": "2026-09-05T20:04:30Z",
   "translations": [
     {
       "id": "lucius-ii-ptbr",
@@ -201,6 +201,29 @@
           "fileName": "Alice-Madness-Returns-PTBR-v1.0.0.zip",
           "downloadUrl": "https://github.com/GabrielMichell/alice-madness-returns-ptbr/releases/download/v1.0.0/Alice-Madness-Returns-PTBR-v1.0.0.zip",
           "sha256": "180217cb1a82882e6db7fd1f5192b6cd9402864176437b3daa6a26d81128ef91"
+        }
+      ]
+    },
+    {
+      "id": "bully-scholarship-edition-ptbr",
+      "game": "Bully: Scholarship Edition",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "packageType": "zip",
+      "description": "Tradução autoral PT-BR para a versão Steam, com menus, opções, missões, objetivos, aulas, atividades, mensagens gerais, créditos e recursos de legenda existentes.",
+      "releaseUrl": "https://github.com/GabrielMichell/bully-scholarship-edition-ptbr/releases/tag/v1.0.0",
+      "steamAppId": "12200",
+      "folderHints": ["Bully Scholarship Edition"],
+      "executableHints": ["Bully.exe"],
+      "install": [
+        { "from": "Config", "to": "game" }
+      ],
+      "assets": [
+        {
+          "role": "package",
+          "fileName": "Bully-Scholarship-Edition-PTBR-v1.0.0.zip",
+          "downloadUrl": "https://github.com/GabrielMichell/bully-scholarship-edition-ptbr/releases/download/v1.0.0/Bully-Scholarship-Edition-PTBR-v1.0.0.zip",
+          "sha256": "f47a340b679da01e84ce7c8110fb72c072e649f857b18e67ca80a16184735f35"
         }
       ]
     }
