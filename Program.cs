@@ -1,4 +1,4 @@
-namespace CentralPtBr;
+namespace BrPatchHub;
 
 static class Program
 {
@@ -8,7 +8,7 @@ static class Program
     [STAThread]
     static int Main(string[] args)
     {
-        SetCurrentProcessExplicitAppUserModelID("GabrielMichell.CentralPTBR");
+        SetCurrentProcessExplicitAppUserModelID("GabrielMichell.BRPatchHub");
         if (args.Length == 5 && args[0].Equals("--apply-update", StringComparison.OrdinalIgnoreCase))
         {
             ApplicationConfiguration.Initialize();

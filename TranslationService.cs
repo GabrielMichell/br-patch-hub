@@ -1,7 +1,7 @@
 using System.IO.Compression;
 using System.Net.Http.Headers;
 
-namespace CentralPtBr;
+namespace BrPatchHub;
 
 public sealed class TranslationService
 {
@@ -14,7 +14,7 @@ public sealed class TranslationService
         _storage = storage;
         _log = log;
         _http = new HttpClient { Timeout = TimeSpan.FromHours(2) };
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd($"Central-PT-BR/{AppConstants.AppVersion}");
+        _http.DefaultRequestHeaders.UserAgent.ParseAdd($"BR-Patch-Hub/{AppConstants.AppVersion}");
     }
 
     public bool IsInstalled(string id) => _storage.Installed.ContainsKey(id);

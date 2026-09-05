@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace CentralPtBr;
+namespace BrPatchHub;
 
 public sealed class Catalog
 {
@@ -80,9 +80,9 @@ public sealed record RemovalResult(bool RequiresSteamRestore, int CleanedFiles, 
 
 public static class AppConstants
 {
-    public const string AppName = "Central PT-BR";
-    public const string AppVersion = "2.2.3";
-    public const string OfficialRepositoryUrl = "https://github.com/GabrielMichell/central-pt-br";
-    public const string CatalogUrl = "https://raw.githubusercontent.com/GabrielMichell/central-pt-br/main/catalog.json";
-    public const string VersionUrl = "https://raw.githubusercontent.com/GabrielMichell/central-pt-br/main/app-version.json";
+    public const string AppName = "BR Patch Hub";
+    public const string AppVersion = "3.0.0";
+    public const string OfficialRepositoryUrl = "https://github.com/GabrielMichell/br-patch-hub";
+    public const string CatalogUrl = "https://raw.githubusercontent.com/GabrielMichell/br-patch-hub/main/catalog.json";
+    public const string VersionUrl = "https://raw.githubusercontent.com/GabrielMichell/br-patch-hub/main/app-version.json";
 }

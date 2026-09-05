@@ -2,13 +2,13 @@ using System.Text;
 using System.Text.Json;
 using System.IO.Compression;
 
-namespace CentralPtBr;
+namespace BrPatchHub;
 
 public static class SelfTest
 {
     public static int Render(string output, int width = 1520, int height = 940)
     {
-        var root = Path.Combine(Path.GetTempPath(), $"central-ptbr-render-{Guid.NewGuid():N}");
+        var root = Path.Combine(Path.GetTempPath(), $"br-patch-hub-render-{Guid.NewGuid():N}");
         try
         {
             using var form = new MainForm(new Storage(root), false) { Size = new Size(width, height), Opacity = 0 };
@@ -22,7 +22,7 @@ public static class SelfTest
         }
         catch (Exception ex)
         {
-            File.WriteAllText(Path.Combine(Path.GetTempPath(), "central-ptbr-render-error.txt"), ex.ToString());
+            File.WriteAllText(Path.Combine(Path.GetTempPath(), "br-patch-hub-render-error.txt"), ex.ToString());
             return 1;
         }
         finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
@@ -30,7 +30,7 @@ public static class SelfTest
 
     public static int Run()
     {
-        var root = Path.Combine(Path.GetTempPath(), $"central-ptbr-test-{Guid.NewGuid():N}");
+        var root = Path.Combine(Path.GetTempPath(), $"br-patch-hub-test-{Guid.NewGuid():N}");
         try
         {
             Directory.CreateDirectory(root);
@@ -75,7 +75,7 @@ public static class SelfTest
             if (removal.RequiresSteamRestore || File.ReadAllText(gameFile) != "original") throw new Exception("Restauração temporária falhou.");
 
             var updateSource = Path.Combine(root, "update-source.exe");
-            var updateTarget = Path.Combine(root, "installed", "Central PT-BR.exe");
+            var updateTarget = Path.Combine(root, "installed", "BR Patch Hub.exe");
             Directory.CreateDirectory(Path.GetDirectoryName(updateTarget)!);
             File.WriteAllText(updateSource, "versão nova");
             File.WriteAllText(updateTarget, "versão antiga");
@@ -98,7 +98,7 @@ public static class SelfTest
         }
         catch (Exception ex)
         {
-            File.WriteAllText(Path.Combine(Path.GetTempPath(), "central-ptbr-self-test-error.txt"), ex.ToString());
+            File.WriteAllText(Path.Combine(Path.GetTempPath(), "br-patch-hub-self-test-error.txt"), ex.ToString());
             return 1;
         }
         finally { if (Directory.Exists(root)) Directory.Delete(root, true); }

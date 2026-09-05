@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Security.Cryptography;
 
-namespace CentralPtBr;
+namespace BrPatchHub;
 
 public sealed class OnlineServices
 {
@@ -14,7 +14,7 @@ public sealed class OnlineServices
     public OnlineServices(Storage storage)
     {
         _storage = storage;
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd($"Central-PT-BR/{AppConstants.AppVersion}");
+        _http.DefaultRequestHeaders.UserAgent.ParseAdd($"BR-Patch-Hub/{AppConstants.AppVersion}");
     }
 
     public async Task<Catalog> RefreshCatalogAsync(CancellationToken cancellationToken = default)
@@ -52,7 +52,7 @@ public sealed class OnlineServices
         if (manifest.Sha256.Length != 64 || !manifest.Sha256.All(Uri.IsHexDigit)) throw new InvalidDataException("A atualização não possui um SHA-256 válido.");
         var directory = Path.Combine(destinationRoot, "updates", manifest.Version);
         Directory.CreateDirectory(directory);
-        var target = Path.Combine(directory, "Central PT-BR.exe");
+        var target = Path.Combine(directory, "BR Patch Hub.exe");
         var temporary = target + ".download";
         using var response = await _http.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         response.EnsureSuccessStatusCode();

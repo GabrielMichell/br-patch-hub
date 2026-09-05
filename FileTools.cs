@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace CentralPtBr;
+namespace BrPatchHub;
 
 public static class FileTools
 {
@@ -68,7 +68,7 @@ public static class FileTools
         result[index - 1] = (byte)newValue.Length;
         Array.Copy(newValue, 0, result, index, newValue.Length);
         Array.Copy(bytes, index + oldValue.Length, result, index + newValue.Length, bytes.Length - index - oldValue.Length);
-        var backup = path + ".central-ptbr.bak";
+        var backup = path + ".br-patch-hub.bak";
         if (!File.Exists(backup)) File.Copy(path, backup);
         File.WriteAllBytes(path, result);
         return true;

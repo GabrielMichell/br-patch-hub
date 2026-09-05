@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace CentralPtBr;
+namespace BrPatchHub;
 
 public static class GameProcessService
 {

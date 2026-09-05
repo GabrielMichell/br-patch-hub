@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
 
-namespace CentralPtBr;
+namespace BrPatchHub;
 
 public static partial class SteamService
 {

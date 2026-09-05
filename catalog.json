@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "catalogName": "Catálogo de traduções PT-BR",
+  "catalogName": "Catálogo do BR Patch Hub",
   "updatedAt": "2026-08-26T15:45:01Z",
   "translations": [
     {
@@ -9,7 +9,7 @@
       "language": "pt-BR",
       "version": "1.0.0",
       "packageType": "multi-zip",
-      "description": "Pacote interno da tradução PT-BR. O Central PT-BR baixa e extrai automaticamente as quatro partes necessárias.",
+      "description": "Pacote interno da tradução PT-BR. O BR Patch Hub baixa e extrai automaticamente as quatro partes necessárias.",
       "releaseUrl": "https://github.com/GabrielMichell/lucius-ii-ptbr/releases/tag/v1.0.0",
       "steamAppId": "296830",
       "folderHints": ["LuciusII"],
@@ -107,7 +107,7 @@
       "language": "pt-BR",
       "version": "1.0.0",
       "packageType": "zip",
-      "description": "Pacote manual interno. O Central PT-BR cria o backup e aplica o complemento nos arquivos VFS sem executar o instalador.",
+      "description": "Pacote manual interno. O BR Patch Hub cria o backup e aplica o complemento nos arquivos VFS sem executar o instalador.",
       "releaseUrl": "https://github.com/GabrielMichell/metro-last-light-ptbr/releases/tag/v1.0.0",
       "steamAppId": "43160",
       "folderHints": ["Metro Last Light"],

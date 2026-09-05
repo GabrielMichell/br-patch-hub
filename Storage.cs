@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace CentralPtBr;
+namespace BrPatchHub;
 
 public sealed class Storage
 {
@@ -37,8 +37,16 @@ public sealed class Storage
 
     private void MigrateLegacyData()
     {
-        var legacy = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TradutorHub");
-        if (Directory.Exists(legacy) && !Directory.Exists(Root)) Directory.Move(legacy, Root);
+        var localData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        foreach (var legacyName in new[] { "Central PT-BR", "TradutorHub" })
+        {
+            var legacy = Path.Combine(localData, legacyName);
+            if (Directory.Exists(legacy) && !Directory.Exists(Root))
+            {
+                Directory.Move(legacy, Root);
+                break;
+            }
+        }
         Directory.CreateDirectory(Root);
     }
 

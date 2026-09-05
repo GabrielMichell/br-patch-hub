@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace CentralPtBr;
+namespace BrPatchHub;
 
 public static class UpdateInstaller
 {
@@ -24,7 +24,7 @@ public static class UpdateInstaller
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Não foi possível concluir a atualização.\r\n\r\n{ex.Message}\r\n\r\nA versão anterior foi preservada.", "Central PT-BR — Falha na atualização", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Não foi possível concluir a atualização.\r\n\r\n{ex.Message}\r\n\r\nA versão anterior foi preservada.", "BR Patch Hub — Falha na atualização", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return 1;
         }
     }
