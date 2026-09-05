@@ -39,6 +39,10 @@ public static class SelfTest
             try { FileTools.ResolveInside(root, "../fora.txt"); throw new Exception("Path traversal não foi bloqueado."); }
             catch (InvalidDataException) { }
 
+            if (GameProcessService.IsActiveSnapshot(false, 0, 0)) throw new Exception("Processo residual foi considerado jogo ativo.");
+            if (!GameProcessService.IsActiveSnapshot(false, 4, 20)) throw new Exception("Processo ativo não foi reconhecido.");
+            if (GameProcessService.IsActiveSnapshot(true, 4, 20)) throw new Exception("Processo encerrado foi considerado ativo.");
+
             var config = Path.Combine(root, "config.sav");
             var oldValue = Encoding.UTF8.GetBytes("Português");
             var bytes = new byte[oldValue.Length + 5];

@@ -6,6 +6,15 @@ public static class GameProcessService
 {
     public static string? FindRunning(Translation translation, string? gameRoot)
     {
+        var first = FindRunningOnce(translation, gameRoot);
+        if (first is null) return null;
+        Thread.Sleep(600);
+        var confirmed = FindRunningOnce(translation, gameRoot);
+        return confirmed is null ? null : $"{confirmed.Executable} (PID {confirmed.ProcessId})";
+    }
+
+    private static RunningProcess? FindRunningOnce(Translation translation, string? gameRoot)
+    {
         foreach (var hint in translation.ExecutableHints.Where(x => !string.IsNullOrWhiteSpace(x)))
         {
             var executable = Path.GetFileName(hint);
@@ -16,6 +25,11 @@ public static class GameProcessService
                 try
                 {
                     if (process.HasExited) continue;
+                    var threadCount = 1;
+                    var handleCount = 1;
+                    try { threadCount = process.Threads.Count; handleCount = process.HandleCount; }
+                    catch { /* Sem acesso aos detalhes: mantém a decisão conservadora pelo nome exato. */ }
+                    if (!IsActiveSnapshot(process.HasExited, threadCount, handleCount)) continue;
                     if (!string.IsNullOrWhiteSpace(gameRoot))
                     {
                         try
@@ -25,11 +39,15 @@ public static class GameProcessService
                         }
                         catch { /* Nome exato é suficiente quando o Windows não permite ler o caminho. */ }
                     }
-                    return $"{executable} (PID {process.Id})";
+                    return new RunningProcess(executable, process.Id);
                 }
                 finally { process.Dispose(); }
             }
         }
         return null;
     }
+
+    internal static bool IsActiveSnapshot(bool hasExited, int threadCount, int handleCount) => !hasExited && threadCount > 0 && handleCount > 0;
+
+    private sealed record RunningProcess(string Executable, int ProcessId);
 }

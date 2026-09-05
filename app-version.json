@@ -1,7 +1,7 @@
 {
-  "version": "3.1.0",
-  "releaseUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/tag/v3.1.0",
-  "downloadUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/download/v3.1.0/BR-Patch-Hub.exe",
-  "sha256": "d8229e7b6ed2f80ba7ba5bc153988399e774061b11e7985c6ee510ca782e2ee4",
-  "notes": "Detecção aprimorada de atualizações das traduções, comparação semântica de versões, changelog no catálogo e rollback automático para preservar a versão anterior em caso de falha."
+  "version": "3.1.1",
+  "releaseUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/tag/v3.1.1",
+  "downloadUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/download/v3.1.1/BR-Patch-Hub.exe",
+  "sha256": "5d697191601726b45d8e26134640036a6c15f424ae798ff8549557f580c27c51",
+  "notes": "Corrige falsos avisos de jogo em execução causados por processos residuais do Windows e confirma o processo novamente antes de bloquear uma operação."
 }
