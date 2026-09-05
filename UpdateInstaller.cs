@@ -16,7 +16,12 @@ public static class UpdateInstaller
         {
             if (processId > 0)
             {
-                try { Process.GetProcessById(processId).WaitForExit(30000); } catch (ArgumentException) { }
+                try
+                {
+                    var previousProcess = Process.GetProcessById(processId);
+                    previousProcess.WaitForExit();
+                }
+                catch (ArgumentException) { }
             }
             Apply(sourceExecutable, targetExecutable, sha256);
             Process.Start(new ProcessStartInfo(targetExecutable) { UseShellExecute = true, WorkingDirectory = Path.GetDirectoryName(targetExecutable)! });

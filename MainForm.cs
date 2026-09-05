@@ -152,7 +152,7 @@ public sealed class MainForm : Form
             _appUpdateBar.Style = ProgressBarStyle.Continuous; _appUpdateBar.Value = 100; _appUpdatePercent.Text = "100%"; _generalStatus.Text = "Atualização validada. Reiniciando...";
             UpdateInstaller.Start(downloaded, executable, update.Sha256);
             _closing.Cancel();
-            Application.Exit();
+            Environment.Exit(0);
         }
         catch (OperationCanceledException) { }
         catch (Exception ex)

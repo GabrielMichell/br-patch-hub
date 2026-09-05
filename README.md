@@ -2,7 +2,7 @@
 
 Aplicativo desktop para pesquisar traduções e instalá-las diretamente em jogos da Steam, sem abrir outro instalador.
 
-Versão oficial atual: **v3.1.2**.
+Versão oficial atual: **v3.1.3**.
 
 ## O que esta base faz
 

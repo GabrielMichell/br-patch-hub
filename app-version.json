@@ -1,7 +1,7 @@
 {
-  "version": "3.1.2",
-  "releaseUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/tag/v3.1.2",
-  "downloadUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/download/v3.1.2/BR-Patch-Hub.exe",
-  "sha256": "4418796EB5A4C2F9A3C95430CB05E91E62E6C86AF9402F66B5577F4741361B0E",
-  "notes": "Corrige o status de traduções restauradas fora do Hub, migra referências antigas de backup e preserva instalações existentes em situações ambíguas."
+  "version": "3.1.3",
+  "releaseUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/tag/v3.1.3",
+  "downloadUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/download/v3.1.3/BR-Patch-Hub.exe",
+  "sha256": "5B52EA4999C9415BD8BCF30FD4431CA6A125687999A7B3EA61E14BEDEEBA673E",
+  "notes": "Corrige a substituição automática do executável no Windows, aguardando o processo antigo encerrar antes da troca. Inclui também a correção segura do status das traduções restauradas."
 }
