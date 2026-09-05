@@ -216,7 +216,7 @@
       "folderHints": ["Bully Scholarship Edition"],
       "executableHints": ["Bully.exe"],
       "install": [
-        { "from": "Config", "to": "game" }
+        { "from": "Config", "to": "Config" }
       ],
       "assets": [
         {
