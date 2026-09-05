@@ -51,6 +51,14 @@ public static class SelfTest
             if (!FileTools.RepairLengthPrefixedUtf8(config, "Português", "English")) throw new Exception("Correção de idioma não executada.");
             if (!Encoding.UTF8.GetString(File.ReadAllBytes(config)).Contains("English")) throw new Exception("Correção de idioma inválida.");
 
+            var migrationRoot = Path.Combine(root, "migration-state");
+            var migratedBackup = Path.Combine(migrationRoot, "backups", "translation-backup-1");
+            Directory.CreateDirectory(migratedBackup);
+            var legacyRecords = new Dictionary<string, InstalledTranslation> { ["migration-test"] = new() { Id = "migration-test", BackupRoot = Path.Combine(Path.GetTempPath(), "TradutorHub", "backups", "translation-backup-1") } };
+            File.WriteAllText(Path.Combine(migrationRoot, "installed.json"), JsonSerializer.Serialize(legacyRecords));
+            var migratedStorage = new Storage(migrationRoot);
+            if (migratedStorage.Installed["migration-test"].BackupRoot != migratedBackup) throw new Exception("Caminho antigo de backup não foi migrado.");
+
             var storage = new Storage(Path.Combine(root, "state"));
             var game = Path.Combine(root, "game");
             var source = Path.Combine(root, "source");
@@ -75,6 +83,10 @@ public static class SelfTest
             var service = new TranslationService(storage, _ => { });
             service.InstallAsync(translation, game, null, CancellationToken.None).GetAwaiter().GetResult();
             if (File.ReadAllText(gameFile) != "traduzido") throw new Exception("Instalação temporária falhou.");
+            if (service.GetInstallationHealthAsync(translation.Id).GetAwaiter().GetResult() != InstallationHealth.Healthy) throw new Exception("Tradução íntegra não foi reconhecida.");
+            File.WriteAllText(gameFile, "alterado externamente"); File.SetLastWriteTimeUtc(gameFile, DateTime.UtcNow.AddSeconds(2));
+            if (service.GetInstallationHealthAsync(translation.Id).GetAwaiter().GetResult() != InstallationHealth.Modified) throw new Exception("Arquivo alterado não exigiu verificação.");
+            File.WriteAllText(gameFile, "traduzido"); File.SetLastWriteTimeUtc(gameFile, DateTime.UtcNow.AddSeconds(4));
 
             if (!SemanticVersion.TryCompare("1.0.0", "1.0.0", out var equal) || equal != 0) throw new Exception("Cenário 1 de versão falhou.");
             if (!SemanticVersion.TryCompare("1.0.0", "1.1.0", out var newer) || newer >= 0) throw new Exception("Cenário 2 de versão falhou.");
@@ -115,6 +127,11 @@ public static class SelfTest
             };
             service.InstallAsync(successfulUpdate, game, null, CancellationToken.None).GetAwaiter().GetResult();
             if (File.ReadAllText(gameFile) != "versão 1.1" || storage.Installed[translation.Id].Version != "1.1.0") throw new Exception("Cenário 5: atualização concluída não foi registrada.");
+
+            var updatedRecord = storage.Installed[translation.Id];
+            var updatedFile = updatedRecord.Files.Single();
+            File.Copy(FileTools.ResolveInside(updatedRecord.BackupRoot, updatedFile.BackupPath!), gameFile, true);
+            if (service.GetInstallationHealthAsync(translation.Id).GetAwaiter().GetResult() != InstallationHealth.OriginalRestored) throw new Exception("Arquivos originais restaurados não foram reconhecidos.");
 
             var removal = service.RemoveAsync(successfulUpdate, null, CancellationToken.None).GetAwaiter().GetResult();
             if (removal.RequiresSteamRestore || File.ReadAllText(gameFile) != "original") throw new Exception("Restauração temporária falhou.");

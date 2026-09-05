@@ -31,8 +31,21 @@ public sealed class Storage
         Directory.CreateDirectory(PackageRoot);
         Config = Read<AppConfig>(ConfigPath) ?? new AppConfig();
         Installed = Read<Dictionary<string, InstalledTranslation>>(InstalledPath) ?? new(StringComparer.OrdinalIgnoreCase);
+        NormalizeInstalledPaths();
         SaveConfig();
         SaveInstalled();
+    }
+
+    private void NormalizeInstalledPaths()
+    {
+        foreach (var record in Installed.Values)
+        {
+            if (string.IsNullOrWhiteSpace(record.BackupRoot) || Directory.Exists(record.BackupRoot)) continue;
+            var folderName = Path.GetFileName(record.BackupRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+            if (string.IsNullOrWhiteSpace(folderName)) continue;
+            var migrated = Path.Combine(BackupRoot, folderName);
+            if (Directory.Exists(migrated)) record.BackupRoot = migrated;
+        }
     }
 
     private void MigrateLegacyData()

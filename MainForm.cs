@@ -13,6 +13,7 @@ public sealed class MainForm : Form
     private Catalog _catalog = new(); private Translation? _selected;
     private readonly Dictionary<string, string> _foundPaths = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, LibraryState> _states = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _verificationRequired = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Image> _covers = new(StringComparer.OrdinalIgnoreCase);
     private readonly TextBox _search = new(); private readonly ComboBox _filter = new(); private readonly FlowLayoutPanel _games = new(); private readonly Label _libraryCount = new(); private readonly Label _lastCheck = new(); private readonly Label _generalStatus = new(); private readonly ProgressBar _appUpdateBar = new(); private readonly Label _appUpdatePercent = new(); private readonly Panel _detailHost = new(); private readonly RichTextBox _log = new(); private readonly Panel _logHost = new(); private readonly Button _logToggle = new();
     private readonly Label _summaryCatalog = new(), _summaryInstalled = new(), _summaryUpdates = new(), _summaryAvailable = new(), _summaryMissing = new();
@@ -163,12 +164,32 @@ public sealed class MainForm : Form
         }
         finally { if (!_closing.IsCancellationRequested) { _appUpdateBar.Visible = false; _appUpdatePercent.Visible = false; } }
     }
-    private void EnsureStates() { foreach (var item in _catalog.Translations) { if (_storage.Installed.TryGetValue(item.Id, out var installed) && _foundPaths.ContainsKey(item.Id) && Directory.Exists(installed.GamePath)) _states[item.Id] = !SemanticVersion.TryCompare(installed.Version, item.Version, out var comparison) ? LibraryState.VerificationRequired : comparison < 0 ? LibraryState.UpdateAvailable : LibraryState.Installed; else if (_foundPaths.ContainsKey(item.Id)) _states[item.Id] = LibraryState.Available; else _states[item.Id] = LibraryState.NotFound; } }
+    private void EnsureStates() { foreach (var item in _catalog.Translations) { if (_storage.Installed.TryGetValue(item.Id, out var installed) && _foundPaths.ContainsKey(item.Id) && Directory.Exists(installed.GamePath)) _states[item.Id] = _verificationRequired.Contains(item.Id) || !SemanticVersion.TryCompare(installed.Version, item.Version, out var comparison) ? LibraryState.VerificationRequired : comparison < 0 ? LibraryState.UpdateAvailable : LibraryState.Installed; else if (_foundPaths.ContainsKey(item.Id)) _states[item.Id] = LibraryState.Available; else _states[item.Id] = LibraryState.NotFound; } }
     private async Task ScanLibraryAsync(bool announce)
     {
-        SetBusy(true); _generalStatus.Text = "Escaneando bibliotecas Steam..."; _generalStatus.ForeColor = Yellow; if (announce) Log("Escaneamento geral iniciado."); try { _foundPaths.Clear(); await Task.Run(() => { foreach (var item in _catalog.Translations) { var path = SteamService.FindGame(item); if (path is null && _storage.Config.GamePaths.TryGetValue(item.Id, out var manual) && IsValidGameFolder(item, manual)) path = manual; if (path is not null) _foundPaths[item.Id] = path; } }); ReconcileUninstalledGames(); EnsureStates(); _storage.Config.LastCatalogCheck = DateTimeOffset.Now; _storage.SaveConfig(); _lastCheck.Text = $"Última verificação: {DateTime.Now:dd/MM/yyyy HH:mm}"; var updates = _states.Values.Any(x => x == LibraryState.UpdateAvailable); _generalStatus.Text = updates ? "Há atualizações disponíveis" : "Tudo atualizado!"; _generalStatus.ForeColor = updates ? Yellow : Green; RefreshGameList(); if (_selected is not null) ShowDetails(_selected); if (announce) Log("Escaneamento concluído."); } finally { SetBusy(false); }
+        SetBusy(true); _generalStatus.Text = "Escaneando bibliotecas Steam..."; _generalStatus.ForeColor = Yellow; if (announce) Log("Escaneamento geral iniciado."); try { _foundPaths.Clear(); await Task.Run(() => { foreach (var item in _catalog.Translations) { var path = SteamService.FindGame(item); if (path is null && _storage.Config.GamePaths.TryGetValue(item.Id, out var manual) && IsValidGameFolder(item, manual)) path = manual; if (path is not null) _foundPaths[item.Id] = path; } }); ReconcileUninstalledGames(); await ReconcileInstallationHealthAsync(); EnsureStates(); _storage.Config.LastCatalogCheck = DateTimeOffset.Now; _storage.SaveConfig(); _lastCheck.Text = $"Última verificação: {DateTime.Now:dd/MM/yyyy HH:mm}"; var updates = _states.Values.Any(x => x == LibraryState.UpdateAvailable); _generalStatus.Text = updates ? "Há atualizações disponíveis" : "Tudo atualizado!"; _generalStatus.ForeColor = updates ? Yellow : Green; RefreshGameList(); if (_selected is not null) ShowDetails(_selected); if (announce) Log("Escaneamento concluído."); } finally { SetBusy(false); }
     }
     private void ReconcileUninstalledGames() { var changed = false; foreach (var item in _catalog.Translations) { if (!_storage.Installed.ContainsKey(item.Id) || _foundPaths.ContainsKey(item.Id)) continue; _storage.Installed.Remove(item.Id); _storage.Config.GamePaths.Remove(item.Id); Log($"Jogo desinstalado detectado; registro antigo removido: {item.Game}. Backups físicos preservados."); changed = true; } if (changed) { _storage.SaveInstalled(); _storage.SaveConfig(); } }
+    private async Task ReconcileInstallationHealthAsync()
+    {
+        _verificationRequired.Clear();
+        foreach (var item in _catalog.Translations.Where(x => _storage.Installed.ContainsKey(x.Id) && _foundPaths.ContainsKey(x.Id)).ToList())
+        {
+            _generalStatus.Text = $"Verificando instalação: {item.Game}";
+            var health = await _translations.GetInstallationHealthAsync(item.Id, _closing.Token);
+            if (health == InstallationHealth.OriginalRestored)
+            {
+                _storage.Installed.Remove(item.Id);
+                Log($"Tradução já restaurada externamente; registro removido: {item.Game}. Backups físicos preservados.");
+            }
+            else if (health == InstallationHealth.Modified)
+            {
+                _verificationRequired.Add(item.Id);
+                Log($"Verificação necessária: os arquivos de {item.Game} não correspondem à tradução registrada nem ao backup original.");
+            }
+        }
+        _storage.SaveInstalled();
+    }
     private async Task RefreshCatalogAndScanAsync() { try { _catalog = await _online.RefreshCatalogAsync(_closing.Token); Log("Catálogo atualizado manualmente."); } catch (Exception ex) { Log($"Falha ao atualizar catálogo: {ex.Message}"); _generalStatus.Text = "Não foi possível atualizar o catálogo"; _generalStatus.ForeColor = Red; } await ScanLibraryAsync(false); }
     private void RefreshGameList()
     {

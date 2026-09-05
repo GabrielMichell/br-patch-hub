@@ -71,6 +71,7 @@ public sealed class InstalledFile
     public string RelativePath { get; set; } = "";
     public string InstalledHash { get; set; } = "";
     public long InstalledSize { get; set; }
+    public DateTime? VerifiedWriteTimeUtc { get; set; }
     public string? BackupPath { get; set; }
     public string RestoreMethod { get; set; } = "";
 }
@@ -78,11 +79,12 @@ public sealed class InstalledFile
 public sealed class AppVersionManifest { public string Version { get; set; } = ""; public string ReleaseUrl { get; set; } = ""; public string DownloadUrl { get; set; } = ""; public string Sha256 { get; set; } = ""; public string Notes { get; set; } = ""; }
 public sealed record ProgressInfo(string Message, int? Percent = null);
 public sealed record RemovalResult(bool RequiresSteamRestore, int CleanedFiles, bool LanguageRepaired);
+public enum InstallationHealth { Healthy, OriginalRestored, Modified }
 
 public static class AppConstants
 {
     public const string AppName = "BR Patch Hub";
-    public const string AppVersion = "3.1.1";
+    public const string AppVersion = "3.1.2";
     public const string OfficialRepositoryUrl = "https://github.com/GabrielMichell/br-patch-hub";
     public const string CatalogUrl = "https://raw.githubusercontent.com/GabrielMichell/br-patch-hub/main/catalog.json";
     public const string VersionUrl = "https://raw.githubusercontent.com/GabrielMichell/br-patch-hub/main/app-version.json";

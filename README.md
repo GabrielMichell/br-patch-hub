@@ -2,7 +2,7 @@
 
 Aplicativo desktop para pesquisar traduções e instalá-las diretamente em jogos da Steam, sem abrir outro instalador.
 
-Versão oficial atual: **v3.1.1**.
+Versão oficial atual: **v3.1.2**.
 
 ## O que esta base faz
 
@@ -19,6 +19,8 @@ Versão oficial atual: **v3.1.1**.
 - Permite atualizar e remover a tradução pelo próprio app.
 - Compara semanticamente a versão instalada com a versão mais recente do catálogo.
 - Preserva e restaura automaticamente a tradução anterior caso uma atualização falhe.
+- Reconhece quando os arquivos originais foram restaurados fora do Hub e corrige o status sem alterar os arquivos do jogo.
+- Migra com segurança referências de backup criadas pelas versões antigas do aplicativo.
 - Atualiza o catálogo automaticamente ao abrir.
 - Verifica atualizações do próprio BR Patch Hub, baixa o novo executável, valida o SHA-256 e reinicia o aplicativo.
 - Exibe biblioteca visual com capas, filtros, status e resumo das traduções.

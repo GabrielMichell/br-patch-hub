@@ -30,6 +30,52 @@ public sealed class TranslationService
         return Task.FromResult(true);
     }
 
+    public async Task<InstallationHealth> GetInstallationHealthAsync(string id, CancellationToken cancellationToken = default)
+    {
+        if (!_storage.Installed.TryGetValue(id, out var record) || record.Files.Count == 0) return InstallationHealth.Modified;
+        var allInstalled = true;
+        var allOriginal = true;
+        foreach (var file in record.Files)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var target = FileTools.ResolveInside(record.GamePath, file.RelativePath);
+            var installedMatch = await MatchesAsync(target, file, cancellationToken);
+            allInstalled &= installedMatch;
+            if (installedMatch) { allOriginal = false; continue; }
+
+            var restoreMethod = file.RestoreMethod.ToLowerInvariant();
+            var backup = string.IsNullOrWhiteSpace(record.BackupRoot) || string.IsNullOrWhiteSpace(file.BackupPath)
+                ? null
+                : FileTools.ResolveInside(record.BackupRoot, file.BackupPath);
+            if (string.IsNullOrWhiteSpace(restoreMethod)) restoreMethod = backup is not null && File.Exists(backup) ? "backup" : "delete";
+            var originalMatch = restoreMethod switch
+            {
+                "delete" => !File.Exists(target),
+                "backup" when backup is not null && File.Exists(backup) => await FilesEqualAsync(target, backup, cancellationToken),
+                _ => false
+            };
+            allOriginal &= originalMatch;
+        }
+        return allInstalled ? InstallationHealth.Healthy : allOriginal ? InstallationHealth.OriginalRestored : InstallationHealth.Modified;
+    }
+
+    private static async Task<bool> MatchesAsync(string path, InstalledFile file, CancellationToken cancellationToken)
+    {
+        if (!File.Exists(path)) return false;
+        var info = new FileInfo(path);
+        if (info.Length != file.InstalledSize) return false;
+        if (file.VerifiedWriteTimeUtc.HasValue && info.LastWriteTimeUtc == file.VerifiedWriteTimeUtc.Value) return true;
+        var matches = string.Equals(await FileTools.Sha256Async(path, cancellationToken), file.InstalledHash, StringComparison.OrdinalIgnoreCase);
+        if (matches) file.VerifiedWriteTimeUtc = info.LastWriteTimeUtc;
+        return matches;
+    }
+
+    private static async Task<bool> FilesEqualAsync(string left, string right, CancellationToken cancellationToken)
+    {
+        if (!File.Exists(left) || !File.Exists(right) || new FileInfo(left).Length != new FileInfo(right).Length) return false;
+        return string.Equals(await FileTools.Sha256Async(left, cancellationToken), await FileTools.Sha256Async(right, cancellationToken), StringComparison.OrdinalIgnoreCase);
+    }
+
     public async Task InstallAsync(Translation translation, string gameRoot, IProgress<ProgressInfo>? progress, CancellationToken cancellationToken)
     {
         ValidateTranslation(translation);
@@ -98,6 +144,7 @@ public sealed class TranslationService
                     RelativePath = entry.RelativePath,
                     InstalledHash = await FileTools.Sha256Async(entry.Target, cancellationToken),
                     InstalledSize = new FileInfo(entry.Target).Length,
+                    VerifiedWriteTimeUtc = File.GetLastWriteTimeUtc(entry.Target),
                     BackupPath = backupPath,
                     RestoreMethod = restoreMethod
                 });
@@ -186,6 +233,13 @@ public sealed class TranslationService
     public async Task<RemovalResult> RemoveAsync(Translation translation, IProgress<ProgressInfo>? progress, CancellationToken cancellationToken)
     {
         if (!_storage.Installed.TryGetValue(translation.Id, out var record)) return await RestoreExtrasAsync(translation, cancellationToken);
+        if (await GetInstallationHealthAsync(translation.Id, cancellationToken) == InstallationHealth.OriginalRestored)
+        {
+            _storage.Installed.Remove(translation.Id);
+            _storage.SaveInstalled();
+            _log($"Registro removido: os arquivos originais de {translation.Id} já estavam restaurados.");
+            return new RemovalResult(false, 0, false);
+        }
         for (var i = 0; i < record.Files.Count; i++)
         {
             var file = record.Files[i];
