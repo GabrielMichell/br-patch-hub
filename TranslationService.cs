@@ -35,21 +35,26 @@ public sealed class TranslationService
         ValidateTranslation(translation);
         gameRoot = Path.GetFullPath(gameRoot);
         if (!Directory.Exists(gameRoot)) throw new DirectoryNotFoundException("A pasta do jogo não existe.");
-
-        if (_storage.Installed.ContainsKey(translation.Id))
-        {
-            var removal = await RemoveAsync(translation, progress, cancellationToken);
-            if (removal.RequiresSteamRestore) throw new InvalidOperationException("A Steam precisa restaurar os arquivos originais antes de atualizar esta tradução.");
-        }
-
         var packages = await DownloadPackagesAsync(translation, progress, cancellationToken);
         var staging = Path.Combine(_storage.TempRoot, $"install-{translation.Id}-{Guid.NewGuid():N}");
+        var rollbackRoot = Path.Combine(_storage.TempRoot, $"rollback-{translation.Id}-{Guid.NewGuid():N}");
+        var previous = _storage.Installed.GetValueOrDefault(translation.Id);
+        List<FileSnapshot>? snapshots = null;
         Directory.CreateDirectory(staging);
         try
         {
             for (var i = 0; i < packages.Count; i++) await ExtractZipAsync(packages[i], staging, progress, $"Extraindo pacote {i + 1} de {packages.Count}", cancellationToken);
             var plan = BuildPlan(translation, staging, gameRoot);
             EnsureNoConflicts(translation.Id, plan.Select(x => x.Target));
+
+            if (previous is not null)
+            {
+                progress?.Report(new ProgressInfo("Preparando ponto de restauração da versão instalada...", 0));
+                snapshots = CaptureSnapshots(TransactionTargets(translation, previous, plan), rollbackRoot);
+                var removal = await RemoveAsync(translation, progress, cancellationToken);
+                if (removal.RequiresSteamRestore) throw new InvalidOperationException("A Steam precisa restaurar os arquivos originais antes de atualizar esta tradução.");
+            }
+
             var backupRoot = Path.Combine(_storage.BackupRoot, $"{translation.Id}-{Guid.NewGuid():N}");
             Directory.CreateDirectory(backupRoot);
             var installedFiles = new List<InstalledFile>();
@@ -110,9 +115,71 @@ public sealed class TranslationService
             progress?.Report(new ProgressInfo("Instalação concluída.", 100));
             _log($"Instalação concluída: {translation.DisplayName}");
         }
+        catch (Exception ex)
+        {
+            if (snapshots is not null && previous is not null)
+            {
+                try
+                {
+                    progress?.Report(new ProgressInfo("Falha detectada. Restaurando a tradução anterior...", null));
+                    RestoreSnapshots(snapshots);
+                    _storage.Installed[translation.Id] = previous;
+                    _storage.SaveInstalled();
+                    _log($"Atualização revertida com sucesso: {translation.Id} permaneceu na versão {previous.Version}.");
+                }
+                catch (Exception rollbackError)
+                {
+                    _log($"Falha crítica no rollback de {translation.Id}: {rollbackError.Message}");
+                    throw new AggregateException("A atualização falhou e o rollback não pôde ser concluído automaticamente.", ex, rollbackError);
+                }
+                throw new InvalidOperationException($"A atualização falhou. A versão {previous.Version} foi restaurada e continua instalada.", ex);
+            }
+            throw;
+        }
         finally
         {
             if (Directory.Exists(staging)) Directory.Delete(staging, true);
+            if (Directory.Exists(rollbackRoot)) Directory.Delete(rollbackRoot, true);
+        }
+    }
+
+    private static IEnumerable<string> TransactionTargets(Translation translation, InstalledTranslation previous, IEnumerable<PlanEntry> plan)
+    {
+        foreach (var file in previous.Files) yield return FileTools.ResolveInside(previous.GamePath, file.RelativePath);
+        foreach (var entry in plan) yield return entry.Target;
+        foreach (var cleanup in translation.SteamCleanup) yield return FileTools.ResolveInside(previous.GamePath, cleanup.Path);
+        if (translation.LanguagePreferenceRepair is { } repair)
+            yield return FileTools.ResolveInside(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), repair.Path);
+    }
+
+    private static List<FileSnapshot> CaptureSnapshots(IEnumerable<string> targets, string rollbackRoot)
+    {
+        Directory.CreateDirectory(rollbackRoot);
+        var result = new List<FileSnapshot>();
+        foreach (var target in targets.Select(Path.GetFullPath).Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            string? copy = null;
+            if (File.Exists(target))
+            {
+                copy = Path.Combine(rollbackRoot, $"{result.Count:D6}.bak");
+                File.Copy(target, copy, true);
+            }
+            result.Add(new FileSnapshot(target, copy));
+        }
+        return result;
+    }
+
+    private static void RestoreSnapshots(IEnumerable<FileSnapshot> snapshots)
+    {
+        foreach (var snapshot in snapshots)
+        {
+            if (snapshot.Backup is null)
+            {
+                if (File.Exists(snapshot.Target)) File.Delete(snapshot.Target);
+                continue;
+            }
+            Directory.CreateDirectory(Path.GetDirectoryName(snapshot.Target)!);
+            File.Copy(snapshot.Backup, snapshot.Target, true);
         }
     }
 
@@ -330,4 +397,5 @@ public sealed class TranslationService
 
     private static string FormatSize(long bytes) => bytes >= 1024L * 1024 * 1024 ? $"{bytes / (1024d * 1024 * 1024):0.0} GB" : $"{bytes / (1024d * 1024):0.0} MB";
     private sealed record PlanEntry(string Type, string Source, string Target, string RelativePath, int Alignment, long ExpectedSize);
+    private sealed record FileSnapshot(string Target, string? Backup);
 }

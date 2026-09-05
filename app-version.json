@@ -1,7 +1,7 @@
 {
-  "version": "3.0.0",
-  "releaseUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/tag/v3.0.0",
-  "downloadUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/download/v3.0.0/BR-Patch-Hub.exe",
-  "sha256": "b2363f77bf81ae16b243110659aec1f0117612f6ef2e0309d0859f82f15a108d",
-  "notes": "Nova identidade BR Patch Hub, com logo, nome do aplicativo, executável, links e metadados atualizados. Os dados das versões anteriores são migrados automaticamente."
+  "version": "3.1.0",
+  "releaseUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/tag/v3.1.0",
+  "downloadUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/download/v3.1.0/BR-Patch-Hub.exe",
+  "sha256": "d8229e7b6ed2f80ba7ba5bc153988399e774061b11e7985c6ee510ca782e2ee4",
+  "notes": "Detecção aprimorada de atualizações das traduções, comparação semântica de versões, changelog no catálogo e rollback automático para preservar a versão anterior em caso de falha."
 }

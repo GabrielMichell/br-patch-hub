@@ -71,7 +71,48 @@ public static class SelfTest
             var service = new TranslationService(storage, _ => { });
             service.InstallAsync(translation, game, null, CancellationToken.None).GetAwaiter().GetResult();
             if (File.ReadAllText(gameFile) != "traduzido") throw new Exception("Instalação temporária falhou.");
-            var removal = service.RemoveAsync(translation, null, CancellationToken.None).GetAwaiter().GetResult();
+
+            if (!SemanticVersion.TryCompare("1.0.0", "1.0.0", out var equal) || equal != 0) throw new Exception("Cenário 1 de versão falhou.");
+            if (!SemanticVersion.TryCompare("1.0.0", "1.1.0", out var newer) || newer >= 0) throw new Exception("Cenário 2 de versão falhou.");
+            if (!SemanticVersion.TryCompare("1.10.0", "1.9.0", out var olderCatalog) || olderCatalog <= 0) throw new Exception("Cenário 4 de versão falhou.");
+            if (!SemanticVersion.TryCompare("v1.0", "1.0.0", out var normalized) || normalized != 0) throw new Exception("Normalização semântica falhou.");
+
+            var updateFiles = Path.Combine(root, "update-package");
+            Directory.CreateDirectory(updateFiles);
+            File.WriteAllText(Path.Combine(updateFiles, "text.bin"), "versão 1.1");
+            File.WriteAllText(Path.Combine(updateFiles, "payload.bin"), "dados");
+            var guardFile = Path.Combine(game, "guard.bin");
+            File.WriteAllText(guardFile, "original protegido");
+            var updateZip = Path.Combine(root, "update-package.zip");
+            ZipFile.CreateFromDirectory(updateFiles, updateZip);
+            var updatePackageHash = FileTools.Sha256Async(updateZip).GetAwaiter().GetResult();
+            var updatePackageDir = Path.Combine(storage.PackageRoot, "self-test", "1.1.0");
+            Directory.CreateDirectory(updatePackageDir);
+            File.Copy(updateZip, Path.Combine(updatePackageDir, "update-package.zip"));
+            var failingUpdate = new Translation
+            {
+                Id = "self-test", Game = "Teste", Version = "1.1.0", PackageType = "zip",
+                Operations =
+                [
+                    new InstallOperation { Type = "copy", From = "text.bin", To = "Game_Data/text.bin" },
+                    new InstallOperation { Type = "append", From = "payload.bin", To = "guard.bin", ExpectedSize = 999 }
+                ],
+                Assets = [new PackageAsset { Role = "package", FileName = "update-package.zip", DownloadUrl = "https://github.com/example/test/releases/download/v1.1/update-package.zip", Sha256 = updatePackageHash }]
+            };
+            try { service.InstallAsync(failingUpdate, game, null, CancellationToken.None).GetAwaiter().GetResult(); throw new Exception("A atualização inválida não foi bloqueada."); }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("versão 1.0.0 foi restaurada", StringComparison.OrdinalIgnoreCase)) { }
+            if (File.ReadAllText(gameFile) != "traduzido" || File.ReadAllText(guardFile) != "original protegido" || storage.Installed[translation.Id].Version != "1.0.0") throw new Exception("Cenário 6: rollback não preservou a tradução anterior.");
+
+            var successfulUpdate = new Translation
+            {
+                Id = "self-test", Game = "Teste", Version = "1.1.0", PackageType = "zip",
+                Operations = [new InstallOperation { Type = "copy", From = "text.bin", To = "Game_Data/text.bin" }],
+                Assets = failingUpdate.Assets
+            };
+            service.InstallAsync(successfulUpdate, game, null, CancellationToken.None).GetAwaiter().GetResult();
+            if (File.ReadAllText(gameFile) != "versão 1.1" || storage.Installed[translation.Id].Version != "1.1.0") throw new Exception("Cenário 5: atualização concluída não foi registrada.");
+
+            var removal = service.RemoveAsync(successfulUpdate, null, CancellationToken.None).GetAwaiter().GetResult();
             if (removal.RequiresSteamRestore || File.ReadAllText(gameFile) != "original") throw new Exception("Restauração temporária falhou.");
 
             var updateSource = Path.Combine(root, "update-source.exe");

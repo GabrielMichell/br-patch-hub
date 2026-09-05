@@ -2,7 +2,7 @@
 
 Aplicativo desktop para pesquisar traduções e instalá-las diretamente em jogos da Steam, sem abrir outro instalador.
 
-Versão oficial atual: **v3.0.0**.
+Versão oficial atual: **v3.1.0**.
 
 ## O que esta base faz
 
@@ -17,6 +17,8 @@ Versão oficial atual: **v3.0.0**.
 - Faz backup dos arquivos originais antes de substituir.
 - Detecta conflito com arquivos pertencentes a outra tradução.
 - Permite atualizar e remover a tradução pelo próprio app.
+- Compara semanticamente a versão instalada com a versão mais recente do catálogo.
+- Preserva e restaura automaticamente a tradução anterior caso uma atualização falhe.
 - Atualiza o catálogo automaticamente ao abrir.
 - Verifica atualizações do próprio BR Patch Hub, baixa o novo executável, valida o SHA-256 e reinicia o aplicativo.
 - Exibe biblioteca visual com capas, filtros, status e resumo das traduções.
@@ -42,6 +44,7 @@ https://raw.githubusercontent.com/GabrielMichell/br-patch-hub/main/catalog.json
 ## Como cadastrar uma tradução ZIP
 
 Cada item do `catalog.json` usa `packageType` `zip` ou `multi-zip`, uma lista de `assets` e regras `install`.
+O campo opcional `changelog` aceita uma lista de alterações da versão atual e é exibido quando houver atualização disponível.
 
 ~~~json
 {
@@ -49,6 +52,7 @@ Cada item do `catalog.json` usa `packageType` `zip` ou `multi-zip`, uma lista de
   "game": "Nome do jogo",
   "language": "pt-BR",
   "version": "1.0.0",
+  "changelog": ["Correções de textos", "Ajustes de compatibilidade"],
   "packageType": "zip",
   "folderHints": ["Nome da pasta Steam"],
   "install": [

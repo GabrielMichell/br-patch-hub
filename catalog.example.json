@@ -8,6 +8,7 @@
       "game": "Nome do jogo",
       "language": "pt-BR",
       "version": "1.0.0",
+      "changelog": ["Correções de textos", "Ajustes de compatibilidade"],
       "packageType": "zip",
       "description": "Pacote de arquivos instalado pelo BR Patch Hub.",
       "folderHints": ["Nome da pasta Steam"],
