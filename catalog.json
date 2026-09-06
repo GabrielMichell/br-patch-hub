@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "catalogName": "Catálogo do BR Patch Hub",
-  "updatedAt": "2026-09-06T14:26:44Z",
+  "updatedAt": "2026-09-06T18:06:10Z",
   "translations": [
     {
       "id": "lucius-ii-ptbr",
@@ -247,6 +247,29 @@
           "fileName": "Need-for-Speed-Most-Wanted-2012-PTBR-v1.0.0.zip",
           "downloadUrl": "https://github.com/GabrielMichell/need-for-speed-most-wanted-2012-ptbr/releases/download/v1.0.0/Need-for-Speed-Most-Wanted-2012-PTBR-v1.0.0.zip",
           "sha256": "4953d3ffc5ba068b64385bbe1106376d3ba4c731af6a61a8c0966ef776620344"
+        }
+      ]
+    },
+    {
+      "id": "crash-bandicoot-n-sane-trilogy-ptbr",
+      "game": "Crash Bandicoot™ N. Sane Trilogy",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "packageType": "zip",
+      "description": "Tradução autoral PT-BR para a versão Steam dos três jogos da Crash Bandicoot N. Sane Trilogy, com menus, tutoriais, telas de resultados, carregamentos, nomes de fases, dicas e textos de interface. As falas das cutscenes não possuem linhas e temporização disponíveis nos arquivos originais e não fazem parte desta versão.",
+      "releaseUrl": "https://github.com/GabrielMichell/crash-bandicoot-n-sane-trilogy-ptbr/releases/tag/v1.0.0",
+      "steamAppId": "731490",
+      "folderHints": ["Crash Bandicoot - N Sane Trilogy"],
+      "executableHints": ["CrashBandicootNSaneTrilogy.exe"],
+      "install": [
+        { "from": ".", "to": "game" }
+      ],
+      "assets": [
+        {
+          "role": "package",
+          "fileName": "Crash-Bandicoot-N-Sane-Trilogy-PTBR-v1.0.0.zip",
+          "downloadUrl": "https://github.com/GabrielMichell/crash-bandicoot-n-sane-trilogy-ptbr/releases/download/v1.0.0/Crash-Bandicoot-N-Sane-Trilogy-PTBR-v1.0.0.zip",
+          "sha256": "b871ee00b4cd21fadc4c8448a952d35fbbeafe39987d26e86d3b76c64b0e1f8a"
         }
       ]
     }
