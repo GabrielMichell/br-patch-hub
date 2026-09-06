@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "catalogName": "Catálogo do BR Patch Hub",
-  "updatedAt": "2026-09-05T20:04:30Z",
+  "updatedAt": "2026-09-06T14:26:44Z",
   "translations": [
     {
       "id": "lucius-ii-ptbr",
@@ -224,6 +224,29 @@
           "fileName": "Bully-Scholarship-Edition-PTBR-v1.0.0.zip",
           "downloadUrl": "https://github.com/GabrielMichell/bully-scholarship-edition-ptbr/releases/download/v1.0.0/Bully-Scholarship-Edition-PTBR-v1.0.0.zip",
           "sha256": "f47a340b679da01e84ce7c8110fb72c072e649f857b18e67ca80a16184735f35"
+        }
+      ]
+    },
+    {
+      "id": "need-for-speed-most-wanted-2012-ptbr",
+      "game": "Need for Speed(TM) Most Wanted (2012)",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "packageType": "zip",
+      "description": "Tradução autoral PT-BR para a versão Steam, com menus, opções, objetivos, eventos, mensagens, rádios, descrições de Mods, créditos e recursos de texto existentes no idioma original.",
+      "releaseUrl": "https://github.com/GabrielMichell/need-for-speed-most-wanted-2012-ptbr/releases/tag/v1.0.0",
+      "steamAppId": "1262560",
+      "folderHints": ["Need for Speed(TM) Most Wanted"],
+      "executableHints": ["NFS13.exe"],
+      "install": [
+        { "from": ".", "to": "game" }
+      ],
+      "assets": [
+        {
+          "role": "package",
+          "fileName": "Need-for-Speed-Most-Wanted-2012-PTBR-v1.0.0.zip",
+          "downloadUrl": "https://github.com/GabrielMichell/need-for-speed-most-wanted-2012-ptbr/releases/download/v1.0.0/Need-for-Speed-Most-Wanted-2012-PTBR-v1.0.0.zip",
+          "sha256": "4953d3ffc5ba068b64385bbe1106376d3ba4c731af6a61a8c0966ef776620344"
         }
       ]
     }
