@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "catalogName": "Catálogo do BR Patch Hub",
-  "updatedAt": "2026-09-06T18:06:10Z",
+  "updatedAt": "2026-09-07T13:09:40Z",
   "translations": [
     {
       "id": "lucius-ii-ptbr",
@@ -270,6 +270,29 @@
           "fileName": "Crash-Bandicoot-N-Sane-Trilogy-PTBR-v1.0.0.zip",
           "downloadUrl": "https://github.com/GabrielMichell/crash-bandicoot-n-sane-trilogy-ptbr/releases/download/v1.0.0/Crash-Bandicoot-N-Sane-Trilogy-PTBR-v1.0.0.zip",
           "sha256": "b871ee00b4cd21fadc4c8448a952d35fbbeafe39987d26e86d3b76c64b0e1f8a"
+        }
+      ]
+    },
+    {
+      "id": "lucidity-ptbr",
+      "game": "Lucidity",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "packageType": "zip",
+      "description": "Tradução autoral PT-BR para a versão Steam de Lucidity, com interface, menus, textos de jogo, telas de ajuda, cartões de tutorial e instruções interativas. O áudio, vídeos e executável permanecem originais.",
+      "releaseUrl": "https://github.com/GabrielMichell/lucidity-ptbr/releases/tag/v1.0.0",
+      "steamAppId": "32410",
+      "folderHints": ["Lucidity"],
+      "executableHints": ["Lucidity.exe"],
+      "install": [
+        { "from": ".", "to": "game" }
+      ],
+      "assets": [
+        {
+          "role": "package",
+          "fileName": "Lucidity-PTBR-v1.0.0.zip",
+          "downloadUrl": "https://github.com/GabrielMichell/lucidity-ptbr/releases/download/v1.0.0/Lucidity-PTBR-v1.0.0.zip",
+          "sha256": "48f0e0d9e75694a7ccf9aaba0f138fdc94a277f66e1e00ea1523d25abdad5133"
         }
       ]
     }
