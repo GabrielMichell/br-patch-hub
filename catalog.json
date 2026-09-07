@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "catalogName": "Catálogo do BR Patch Hub",
-  "updatedAt": "2026-09-07T13:09:40Z",
+  "updatedAt": "2026-09-07T14:14:10Z",
   "translations": [
     {
       "id": "lucius-ii-ptbr",
@@ -293,6 +293,34 @@
           "fileName": "Lucidity-PTBR-v1.0.0.zip",
           "downloadUrl": "https://github.com/GabrielMichell/lucidity-ptbr/releases/download/v1.0.0/Lucidity-PTBR-v1.0.0.zip",
           "sha256": "48f0e0d9e75694a7ccf9aaba0f138fdc94a277f66e1e00ea1523d25abdad5133"
+        }
+      ]
+    },
+    {
+      "id": "lego-harry-potter-years-1-4-ptbr",
+      "game": "LEGO Harry Potter: Years 1-4",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "changelog": [
+        "Tradução dos textos ativos da versão PC/Steam",
+        "Revisão de menus, opções, interface, objetivos, mensagens e créditos",
+        "Prompt de início mantido em inglês por limitação técnica de layout"
+      ],
+      "packageType": "zip",
+      "description": "Tradução de fã PT-BR para a versão Steam de LEGO Harry Potter: Years 1-4. O prompt Press any key / button to start permanece em inglês por limitação técnica do layout MenuStaticFlash e recompressão LZ2K não validada.",
+      "releaseUrl": "https://github.com/GabrielMichell/lego-harry-potter-years-1-4-ptbr/releases/tag/v1.0.0",
+      "steamAppId": "21130",
+      "folderHints": ["LEGO Harry Potter"],
+      "executableHints": ["LEGOHarryPotter.exe"],
+      "install": [
+        { "from": ".", "to": "game" }
+      ],
+      "assets": [
+        {
+          "role": "package",
+          "fileName": "LEGO-Harry-Potter-Years-1-4-PTBR-v1.0.0.zip",
+          "downloadUrl": "https://github.com/GabrielMichell/lego-harry-potter-years-1-4-ptbr/releases/download/v1.0.0/LEGO-Harry-Potter-Years-1-4-PTBR-v1.0.0.zip",
+          "sha256": "514b6ede68bccf3197d59775b53ad5eea2bfaee6069d60226cbb0db6c6a88570"
         }
       ]
     }
