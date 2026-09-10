@@ -100,7 +100,7 @@ public enum InstallationHealth { Healthy, OriginalRestored, Modified }
 public static class AppConstants
 {
     public const string AppName = "BR Patch Hub";
-    public const string AppVersion = "3.2.1";
+    public const string AppVersion = "3.2.2";
     public const string OfficialRepositoryUrl = "https://github.com/GabrielMichell/br-patch-hub";
     public const string CatalogUrl = "https://raw.githubusercontent.com/GabrielMichell/br-patch-hub/main/catalog.json";
     public const string VersionUrl = "https://raw.githubusercontent.com/GabrielMichell/br-patch-hub/main/app-version.json";

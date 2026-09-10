@@ -2,7 +2,7 @@
 
 Aplicativo desktop para pesquisar traduções e instalá-las diretamente em jogos da Steam, sem abrir outro instalador.
 
-Versão oficial atual: **v3.2.1**.
+Versão oficial atual: **v3.2.2**.
 
 ## O que esta base faz
 
@@ -39,6 +39,8 @@ O modelo oficial deve possuir exatamente 360 nós `<text>`. Cada `Notebook.xml` 
 O catálogo de Lucius III não altera `config.sav`: `English.csv` e `Português.csv` do pacote oficial são idênticos e já contêm PT-BR, portanto não existe necessidade técnica de trocar a preferência de idioma durante atualização, remoção ou restauração.
 
 Na desinstalação ou em **Restaurar original**, o Hub reverte apenas os textos que ainda são iguais ao modelo PT-BR. Se a estrutura for incompatível, o backup estiver ausente ou um texto tiver sido alterado posteriormente, o arquivo é preservado e a limitação é registrada no log; o Hub nunca restaura cegamente um `Notebook.xml` antigo sobre progresso novo.
+
+Se a Steam já tiver restaurado parte dos arquivos enquanto ainda existir um registro antigo do Hub, a atualização reconhece individualmente arquivos traduzidos, arquivos iguais ao backup original e resíduos seguros declarados no catálogo. Isso permite reparar/reinstalar sem rejeitar como alteração externa um arquivo que a própria Steam já restaurou.
 
 ## Como executar
 

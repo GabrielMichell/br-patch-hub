@@ -218,7 +218,7 @@ public sealed class TranslationService
                     _log($"Falha crítica no rollback de {translation.Id}: {rollbackError.Message}");
                     throw new AggregateException("A atualização falhou e o rollback não pôde ser concluído automaticamente.", ex, rollbackError);
                 }
-                throw new InvalidOperationException($"A atualização falhou. A versão {previous.Version} foi restaurada e continua instalada.", ex);
+                throw new InvalidOperationException($"A atualização falhou. A versão {previous.Version} foi restaurada e continua instalada. Motivo: {ex.Message}", ex);
             }
             if (notebookMigration is not null)
             {
@@ -289,33 +289,30 @@ public sealed class TranslationService
             _log($"Registro removido: os arquivos originais de {translation.Id} já estavam restaurados.");
             return new RemovalResult(false, 0, false);
         }
+        var fileStates = new List<(InstalledFile File, bool Installed, bool Original, string RestoreMethod)>();
         for (var i = 0; i < record.Files.Count; i++)
         {
             var file = record.Files[i];
             var target = FileTools.ResolveInside(record.GamePath, file.RelativePath);
-            if (!File.Exists(target)) continue;
             progress?.Report(new ProgressInfo($"Verificando arquivo {i + 1} de {record.Files.Count}: {file.RelativePath}", (int)(i * 100L / Math.Max(1, record.Files.Count))));
-            if (await FileTools.Sha256Async(target, cancellationToken) != file.InstalledHash) throw new InvalidOperationException($"A remoção foi interrompida porque '{file.RelativePath}' foi alterado depois da instalação.");
+            var installed = await MatchesAsync(target, file, cancellationToken);
+            var restoreMethod = await EffectiveRestoreMethodAsync(translation, record, file, cancellationToken);
+            var original = !installed && await MatchesOriginalAsync(record, file, target, restoreMethod, cancellationToken);
+            if (!installed && !original)
+                throw new InvalidOperationException($"A remoção foi interrompida porque '{file.RelativePath}' não corresponde nem ao arquivo traduzido registrado nem ao backup original.");
+            fileStates.Add((file, installed, original, restoreMethod));
         }
 
         await RestorePersistentTextsAsync(translation, record, cancellationToken);
 
         var requiresSteam = false;
-        for (var i = 0; i < record.Files.Count; i++)
+        for (var i = 0; i < fileStates.Count; i++)
         {
-            var file = record.Files[i];
+            var state = fileStates[i];
+            var file = state.File;
             var target = FileTools.ResolveInside(record.GamePath, file.RelativePath);
-            var restoreMethod = file.RestoreMethod.ToLowerInvariant();
-            if (string.IsNullOrWhiteSpace(restoreMethod))
-            {
-                if (!string.IsNullOrWhiteSpace(file.BackupPath) && File.Exists(FileTools.ResolveInside(record.BackupRoot, file.BackupPath)))
-                {
-                    var legacyBackup = FileTools.ResolveInside(record.BackupRoot, file.BackupPath);
-                    restoreMethod = await FileTools.Sha256Async(legacyBackup, cancellationToken) == file.InstalledHash ? "steam" : "backup";
-                }
-                else restoreMethod = "delete";
-            }
-            switch (restoreMethod)
+            if (state.Original) continue;
+            switch (state.RestoreMethod)
             {
                 case "backup" when !string.IsNullOrWhiteSpace(file.BackupPath):
                     var backup = FileTools.ResolveInside(record.BackupRoot, file.BackupPath);
@@ -335,6 +332,34 @@ public sealed class TranslationService
         var extras = await RestoreExtrasAsync(translation, cancellationToken);
         _log($"Tradução removida: {translation.Id}");
         return new RemovalResult(requiresSteam || extras.RequiresSteamRestore, extras.CleanedFiles, extras.LanguageRepaired);
+    }
+
+    private static async Task<string> EffectiveRestoreMethodAsync(Translation translation, InstalledTranslation record, InstalledFile file, CancellationToken cancellationToken)
+    {
+        var restoreMethod = file.RestoreMethod.ToLowerInvariant();
+        if (string.IsNullOrWhiteSpace(restoreMethod))
+        {
+            var backup = string.IsNullOrWhiteSpace(file.BackupPath) ? null : FileTools.ResolveInside(record.BackupRoot, file.BackupPath);
+            restoreMethod = backup is not null && File.Exists(backup)
+                ? await FileTools.Sha256Async(backup, cancellationToken) == file.InstalledHash ? "steam" : "backup"
+                : "delete";
+        }
+        if (restoreMethod == "steam" && translation.SteamCleanup.Any(cleanup =>
+                cleanup.Path.Equals(file.RelativePath, StringComparison.OrdinalIgnoreCase) &&
+                cleanup.Sha256.Equals(file.InstalledHash, StringComparison.OrdinalIgnoreCase)))
+            return "delete";
+        return restoreMethod;
+    }
+
+    private static async Task<bool> MatchesOriginalAsync(InstalledTranslation record, InstalledFile file, string target, string restoreMethod, CancellationToken cancellationToken)
+    {
+        return restoreMethod switch
+        {
+            "delete" => !File.Exists(target),
+            "backup" when !string.IsNullOrWhiteSpace(file.BackupPath) =>
+                await FilesEqualAsync(target, FileTools.ResolveInside(record.BackupRoot, file.BackupPath), cancellationToken),
+            _ => false
+        };
     }
 
     public async Task<NotebookOperationResult?> RestorePersistentTextsAsync(Translation translation, CancellationToken cancellationToken)

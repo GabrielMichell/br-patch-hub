@@ -298,6 +298,8 @@ public static class SelfTest
         var source = Path.Combine(integration, "package");
         var sourceModel = Path.Combine(source, "Lucius3_Data", "StreamingAssets", "Notebook.xml");
         var gameModel = Path.Combine(game, "Lucius3_Data", "StreamingAssets", "Notebook.xml");
+        var sourceLevel0 = Path.Combine(source, "Lucius3_Data", "level0");
+        var gameLevel0 = Path.Combine(game, "Lucius3_Data", "level0");
         var persistentNotebook = Path.Combine(persistent, "Game", "Notebook.xml");
         var configSave = Path.Combine(persistent, "config.sav");
         var binarySave = Path.Combine(persistent, "Game", "Notebook_MainPage.sav");
@@ -305,11 +307,13 @@ public static class SelfTest
         Directory.CreateDirectory(Path.GetDirectoryName(gameModel)!);
         Directory.CreateDirectory(Path.GetDirectoryName(persistentNotebook)!);
         File.WriteAllText(sourceModel, BuildNotebookXml("PT-BR", "false", "Modelo", "Modelo"), new UTF8Encoding(false));
+        File.WriteAllText(sourceLevel0, "level0 traduzido", new UTF8Encoding(false));
         var sourceLocalization = Path.Combine(source, "Lucius3_Data", "StreamingAssets", "Localization");
         Directory.CreateDirectory(sourceLocalization);
         File.WriteAllText(Path.Combine(sourceLocalization, "English.csv"), "1909;Não é possível usar o coração nesta área", new UTF8Encoding(false));
         File.Copy(Path.Combine(sourceLocalization, "English.csv"), Path.Combine(sourceLocalization, "Português.csv"));
         File.WriteAllText(gameModel, BuildNotebookXml("EN", "false", "Jogo", "Jogo"), new UTF8Encoding(false));
+        File.WriteAllText(gameLevel0, "level0 original", new UTF8Encoding(false));
         File.WriteAllText(persistentNotebook, BuildNotebookXml("EN", "true", "Save", "Antes"), new UTF8Encoding(false));
         File.WriteAllBytes(configSave, [10, 20, 30, 40, 50]);
         File.WriteAllBytes(binarySave, [60, 70, 80, 90]);
@@ -325,6 +329,7 @@ public static class SelfTest
         {
             Id = LuciusNotebookMigration.TranslationId, Game = "Lucius III", Version = "1.0.0", PackageType = "zip",
             Install = [new InstallRule { From = "Lucius3_Data", To = "Lucius3_Data" }],
+            SteamCleanup = [new CleanupFile { Path = LuciusNotebookMigration.PortugueseCsvRelativePath, Sha256 = FileTools.Sha256Async(Path.Combine(sourceLocalization, "Português.csv")).GetAwaiter().GetResult() }],
             Assets = [new PackageAsset { Role = "package", FileName = "lucius.zip", DownloadUrl = "https://github.com/example/lucius/releases/download/v1/lucius.zip", Sha256 = hash }]
         };
         var service = new TranslationService(state, _ => { }, persistent);
@@ -336,6 +341,28 @@ public static class SelfTest
         service.InstallAsync(translation, game, null, CancellationToken.None).GetAwaiter().GetResult();
         if (service.GetInstallationHealthAsync(translation.Id).GetAwaiter().GetResult() != InstallationHealth.Healthy)
             throw new Exception("Atualização/reinstalação do Lucius III não permaneceu íntegra.");
+
+        var staleRecord = state.Installed[translation.Id];
+        foreach (var file in staleRecord.Files)
+        {
+            var target = FileTools.ResolveInside(staleRecord.GamePath, file.RelativePath);
+            if (!string.IsNullOrWhiteSpace(file.BackupPath))
+                File.Copy(FileTools.ResolveInside(staleRecord.BackupRoot, file.BackupPath), target, true);
+            else if (file.RestoreMethod.Equals("delete", StringComparison.OrdinalIgnoreCase) && File.Exists(target))
+                File.Delete(target);
+        }
+        var portuguesePath = FileTools.ResolveInside(game, LuciusNotebookMigration.PortugueseCsvRelativePath);
+        Directory.CreateDirectory(Path.GetDirectoryName(portuguesePath)!);
+        File.Copy(Path.Combine(sourceLocalization, "Português.csv"), portuguesePath, true);
+        var portugueseRecord = staleRecord.Files.Single(x => x.RelativePath.Equals(LuciusNotebookMigration.PortugueseCsvRelativePath, StringComparison.OrdinalIgnoreCase));
+        portugueseRecord.BackupPath = null;
+        portugueseRecord.RestoreMethod = "steam";
+        staleRecord.NotebookMigration = null;
+        File.WriteAllText(persistentNotebook, BuildNotebookXml("EN", "true", "Save", "Antes"), new UTF8Encoding(false));
+        state.SaveInstalled();
+        service.InstallAsync(translation, game, null, CancellationToken.None).GetAwaiter().GetResult();
+        if (!File.ReadAllText(gameLevel0).Contains("traduzido") || !File.ReadAllText(persistentNotebook).Contains("PT-BR 359") || state.Installed[translation.Id].NotebookMigration?.Files.Count != 1)
+            throw new Exception("Instalação limpa após restauração da Steam e registro residual não foi concluída.");
         File.WriteAllText(persistentNotebook, File.ReadAllText(persistentNotebook).Replace("<active>true</active>", "<active>false</active>").Replace("Antes", "Depois"), new UTF8Encoding(false));
         service.RemoveAsync(translation, null, CancellationToken.None).GetAwaiter().GetResult();
         var result = File.ReadAllText(persistentNotebook);

@@ -1,7 +1,7 @@
 {
-  "version": "3.2.1",
-  "releaseUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/tag/v3.2.1",
-  "downloadUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/download/v3.2.1/BR-Patch-Hub.exe",
-  "sha256": "94DC733D4E76198C533499EABB64727597308017182B9F5FD98DF9627A1F77C0",
-  "notes": "Completa a integração de Lucius III com idempotência estrita, validação explícita dos 360 textos e remoção da alteração desnecessária de config.sav."
+  "version": "3.2.2",
+  "releaseUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/tag/v3.2.2",
+  "downloadUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/download/v3.2.2/BR-Patch-Hub.exe",
+  "sha256": "907A95FCF0863CA9D7823336F0ADA202BA4726DEBD3FFD5EA19B5BDFC68B97DB",
+  "notes": "Corrige instalação, atualização e remoção de Lucius III após a Steam restaurar parcialmente os arquivos enquanto ainda existe um registro antigo no Hub."
 }
