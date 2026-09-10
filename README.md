@@ -26,8 +26,17 @@ Versão oficial atual: **v3.1.3**.
 - Exibe biblioteca visual com capas, filtros, status e resumo das traduções.
 - Mostra o progresso de download, instalação, remoção e verificação sem congelar a interface.
 - Trata operações especiais de pacote, como anexar um payload a um arquivo existente.
+- No Lucius III, mescla somente os nós `<text>` dos cadernos persistentes, com backup individual e preservação do progresso.
 
 O BR Patch Hub não executa arquivos `.exe`. O formato recomendado para cada projeto é um ou mais ZIPs com os arquivos da tradução e as regras de instalação no catálogo.
+
+## Cadernos persistentes do Lucius III
+
+A integração `lucius-iii-ptbr` localiza recursivamente os arquivos `Notebook.xml` em `AppData\LocalLow\Shiver Games\Lucius III`, ignora a pasta `_Backup_LuciusIII_PTBR` e usa o modelo instalado em `Lucius3_Data\StreamingAssets\Notebook.xml`. Somente o conteúdo dos nós `<text>` compatíveis é alterado. Arquivos `.sav`, atributos, IDs, estados, progresso, diálogos e demais dados não textuais não são escritos.
+
+Cada `Notebook.xml` compatível recebe um backup original individual, preservando seu caminho relativo. Reinstalações não sobrescrevem o backup da mesma operação. A escrita usa um arquivo temporário e só substitui o original depois de reabrir o XML e validar estrutura, chaves, atributos e dados não textuais.
+
+Na desinstalação ou em **Restaurar original**, o Hub reverte apenas os textos que ainda são iguais ao modelo PT-BR. Se a estrutura for incompatível, o backup estiver ausente ou um texto tiver sido alterado posteriormente, o arquivo é preservado e a limitação é registrada no log; o Hub nunca restaura cegamente um `Notebook.xml` antigo sobre progresso novo.
 
 ## Como executar
 

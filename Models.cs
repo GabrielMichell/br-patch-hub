@@ -64,6 +64,22 @@ public sealed class InstalledTranslation
     public string SteamAppId { get; set; } = "";
     public DateTimeOffset InstalledAt { get; set; }
     public List<InstalledFile> Files { get; set; } = [];
+    public NotebookMigrationRecord? NotebookMigration { get; set; }
+}
+
+public sealed class NotebookMigrationRecord
+{
+    public string PersistentRoot { get; set; } = "";
+    public string BackupRoot { get; set; } = "";
+    public string ModelRelativePath { get; set; } = "Lucius3_Data/StreamingAssets/Notebook.xml";
+    public List<NotebookMigrationFile> Files { get; set; } = [];
+}
+
+public sealed class NotebookMigrationFile
+{
+    public string RelativePath { get; set; } = "";
+    public string BackupPath { get; set; } = "";
+    public int TextCount { get; set; }
 }
 
 public sealed class InstalledFile

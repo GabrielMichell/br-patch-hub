@@ -8,11 +8,13 @@ public sealed class TranslationService
     private readonly Storage _storage;
     private readonly HttpClient _http;
     private readonly Action<string> _log;
+    private readonly string? _luciusPersistentRootOverride;
 
-    public TranslationService(Storage storage, Action<string> log)
+    public TranslationService(Storage storage, Action<string> log, string? luciusPersistentRootOverride = null)
     {
         _storage = storage;
         _log = log;
+        _luciusPersistentRootOverride = luciusPersistentRootOverride;
         _http = new HttpClient { Timeout = TimeSpan.FromHours(2) };
         _http.DefaultRequestHeaders.UserAgent.ParseAdd($"BR-Patch-Hub/{AppConstants.AppVersion}");
     }
@@ -33,6 +35,23 @@ public sealed class TranslationService
     public async Task<InstallationHealth> GetInstallationHealthAsync(string id, CancellationToken cancellationToken = default)
     {
         if (!_storage.Installed.TryGetValue(id, out var record) || record.Files.Count == 0) return InstallationHealth.Modified;
+        var health = await GetRegularInstallationHealthAsync(record, cancellationToken);
+        if (health != InstallationHealth.Healthy)
+            return LuciusNotebookMigration.AppliesTo(id) && health == InstallationHealth.OriginalRestored && record.NotebookMigration is not null
+                ? InstallationHealth.Modified
+                : health;
+        if (LuciusNotebookMigration.AppliesTo(id))
+        {
+            if (record.NotebookMigration is null) return InstallationHealth.Modified;
+            var model = FileTools.ResolveInside(record.GamePath, record.NotebookMigration.ModelRelativePath);
+            var persistent = await LuciusNotebookMigration.VerifyAsync(model, record.NotebookMigration, _log, cancellationToken);
+            if (persistent.Skipped > 0 || persistent.Changed != persistent.Found) return InstallationHealth.Modified;
+        }
+        return InstallationHealth.Healthy;
+    }
+
+    private static async Task<InstallationHealth> GetRegularInstallationHealthAsync(InstalledTranslation record, CancellationToken cancellationToken)
+    {
         var allInstalled = true;
         var allOriginal = true;
         foreach (var file in record.Files)
@@ -81,16 +100,26 @@ public sealed class TranslationService
         ValidateTranslation(translation);
         gameRoot = Path.GetFullPath(gameRoot);
         if (!Directory.Exists(gameRoot)) throw new DirectoryNotFoundException("A pasta do jogo não existe.");
+        EnsureLuciusClosed(translation, gameRoot);
         var packages = await DownloadPackagesAsync(translation, progress, cancellationToken);
         var staging = Path.Combine(_storage.TempRoot, $"install-{translation.Id}-{Guid.NewGuid():N}");
         var rollbackRoot = Path.Combine(_storage.TempRoot, $"rollback-{translation.Id}-{Guid.NewGuid():N}");
         var previous = _storage.Installed.GetValueOrDefault(translation.Id);
         List<FileSnapshot>? snapshots = null;
+        NotebookMigrationRecord? notebookMigration = null;
         Directory.CreateDirectory(staging);
         try
         {
             for (var i = 0; i < packages.Count; i++) await ExtractZipAsync(packages[i], staging, progress, $"Extraindo pacote {i + 1} de {packages.Count}", cancellationToken);
             var plan = BuildPlan(translation, staging, gameRoot);
+            if (LuciusNotebookMigration.AppliesTo(translation.Id))
+            {
+                LuciusNotebookMigration.ValidateModel(FindSource(staging, LuciusNotebookMigration.ModelRelativePath));
+                var english = FindSource(staging, LuciusNotebookMigration.EnglishCsvRelativePath);
+                var portuguese = FindSource(staging, LuciusNotebookMigration.PortugueseCsvRelativePath);
+                if (await FileTools.Sha256Async(english, cancellationToken) != await FileTools.Sha256Async(portuguese, cancellationToken))
+                    throw new InvalidDataException("O pacote do Lucius III possui conteúdos diferentes em English.csv e Português.csv.");
+            }
             EnsureNoConflicts(translation.Id, plan.Select(x => x.Target));
 
             if (previous is not null)
@@ -150,11 +179,21 @@ public sealed class TranslationService
                 });
             }
 
+            if (LuciusNotebookMigration.AppliesTo(translation.Id))
+            {
+                progress?.Report(new ProgressInfo("Migrando cadernos persistentes do Lucius III...", null));
+                var modelPath = FileTools.ResolveInside(gameRoot, LuciusNotebookMigration.ModelRelativePath);
+                var persistentRoot = _luciusPersistentRootOverride ?? LuciusNotebookMigration.DefaultPersistentRoot;
+                var migration = await LuciusNotebookMigration.MigrateAsync(modelPath, persistentRoot, Path.GetFileName(backupRoot), _log, cancellationToken);
+                notebookMigration = migration.Record;
+                progress?.Report(new ProgressInfo($"Migração persistente: {migration.Changed} arquivo(s), {migration.TextsChanged} texto(s)", 100));
+            }
+
             _storage.Installed[translation.Id] = new InstalledTranslation
             {
                 Id = translation.Id, Game = translation.Game, Version = translation.Version, GamePath = gameRoot,
                 BackupRoot = backupRoot, PackageType = translation.PackageType, SteamAppId = translation.SteamAppId,
-                InstalledAt = DateTimeOffset.UtcNow, Files = installedFiles
+                InstalledAt = DateTimeOffset.UtcNow, Files = installedFiles, NotebookMigration = notebookMigration
             };
             _storage.Config.GamePaths[translation.Id] = gameRoot;
             _storage.SaveConfig();
@@ -181,6 +220,11 @@ public sealed class TranslationService
                 }
                 throw new InvalidOperationException($"A atualização falhou. A versão {previous.Version} foi restaurada e continua instalada.", ex);
             }
+            if (notebookMigration is not null)
+            {
+                await LuciusNotebookMigration.RestoreExactBackupsAsync(notebookMigration, _log, cancellationToken);
+                _log("Falha na instalação: cadernos persistentes restaurados ao estado anterior.");
+            }
             throw;
         }
         finally
@@ -197,6 +241,9 @@ public sealed class TranslationService
         foreach (var cleanup in translation.SteamCleanup) yield return FileTools.ResolveInside(previous.GamePath, cleanup.Path);
         if (translation.LanguagePreferenceRepair is { } repair)
             yield return FileTools.ResolveInside(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), repair.Path);
+        if (previous.NotebookMigration is { } notebook)
+            foreach (var file in notebook.Files)
+                yield return FileTools.ResolveInside(notebook.PersistentRoot, file.RelativePath);
     }
 
     private static List<FileSnapshot> CaptureSnapshots(IEnumerable<string> targets, string rollbackRoot)
@@ -233,8 +280,10 @@ public sealed class TranslationService
     public async Task<RemovalResult> RemoveAsync(Translation translation, IProgress<ProgressInfo>? progress, CancellationToken cancellationToken)
     {
         if (!_storage.Installed.TryGetValue(translation.Id, out var record)) return await RestoreExtrasAsync(translation, cancellationToken);
-        if (await GetInstallationHealthAsync(translation.Id, cancellationToken) == InstallationHealth.OriginalRestored)
+        EnsureLuciusClosed(translation, record.GamePath);
+        if (await GetRegularInstallationHealthAsync(record, cancellationToken) == InstallationHealth.OriginalRestored)
         {
+            await RestorePersistentTextsAsync(translation, record, cancellationToken);
             _storage.Installed.Remove(translation.Id);
             _storage.SaveInstalled();
             _log($"Registro removido: os arquivos originais de {translation.Id} já estavam restaurados.");
@@ -248,6 +297,8 @@ public sealed class TranslationService
             progress?.Report(new ProgressInfo($"Verificando arquivo {i + 1} de {record.Files.Count}: {file.RelativePath}", (int)(i * 100L / Math.Max(1, record.Files.Count))));
             if (await FileTools.Sha256Async(target, cancellationToken) != file.InstalledHash) throw new InvalidOperationException($"A remoção foi interrompida porque '{file.RelativePath}' foi alterado depois da instalação.");
         }
+
+        await RestorePersistentTextsAsync(translation, record, cancellationToken);
 
         var requiresSteam = false;
         for (var i = 0; i < record.Files.Count; i++)
@@ -284,6 +335,29 @@ public sealed class TranslationService
         var extras = await RestoreExtrasAsync(translation, cancellationToken);
         _log($"Tradução removida: {translation.Id}");
         return new RemovalResult(requiresSteam || extras.RequiresSteamRestore, extras.CleanedFiles, extras.LanguageRepaired);
+    }
+
+    public async Task<NotebookOperationResult?> RestorePersistentTextsAsync(Translation translation, CancellationToken cancellationToken)
+    {
+        if (!_storage.Installed.TryGetValue(translation.Id, out var record)) return null;
+        EnsureLuciusClosed(translation, record.GamePath);
+        var result = await RestorePersistentTextsAsync(translation, record, cancellationToken);
+        if (result is not null && result.Skipped == 0)
+        {
+            record.NotebookMigration = null;
+            _storage.SaveInstalled();
+        }
+        return result;
+    }
+
+    private async Task<NotebookOperationResult?> RestorePersistentTextsAsync(Translation translation, InstalledTranslation record, CancellationToken cancellationToken)
+    {
+        if (!LuciusNotebookMigration.AppliesTo(translation.Id) || record.NotebookMigration is null) return null;
+        var model = FileTools.ResolveInside(record.GamePath, record.NotebookMigration.ModelRelativePath);
+        if (!File.Exists(model)) { _log("Reversão dos cadernos persistentes ignorada: modelo PT-BR ausente. Nenhum save foi sobrescrito."); return null; }
+        var result = await LuciusNotebookMigration.RevertTextsAsync(model, record.NotebookMigration, _log, cancellationToken);
+        if (result.Skipped > 0) _log($"Limitação segura: {result.Skipped} Notebook.xml não pôde ser revertido; ele foi preservado integralmente para não apagar progresso.");
+        return result;
     }
 
     public async Task<RemovalResult> RestoreExtrasAsync(Translation translation, CancellationToken cancellationToken)
@@ -440,6 +514,13 @@ public sealed class TranslationService
     {
         if (string.IsNullOrWhiteSpace(translation.Id) || translation.Id.Any(c => !(char.IsLetterOrDigit(c) || c is '-' or '_' or '.'))) throw new InvalidDataException("A tradução possui um ID inválido.");
         if (translation.PackageType is not ("zip" or "multi-zip" or "internal")) throw new NotSupportedException("Formato de tradução não suportado.");
+    }
+
+    private static void EnsureLuciusClosed(Translation translation, string gameRoot)
+    {
+        if (!LuciusNotebookMigration.AppliesTo(translation.Id)) return;
+        var running = GameProcessService.FindRunning(translation, gameRoot);
+        if (running is not null) throw new InvalidOperationException($"Feche o Lucius III para migrar os cadernos persistentes. Processo encontrado: {running}");
     }
 
     private static void ValidateAsset(PackageAsset asset)

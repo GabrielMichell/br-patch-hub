@@ -6,6 +6,36 @@ namespace BrPatchHub;
 
 public static class SelfTest
 {
+    public static int RunLuciusNotebookFixture(string modelSource, string fixtureSource)
+    {
+        var root = Path.Combine(Path.GetTempPath(), $"br-patch-hub-lucius-fixture-{Guid.NewGuid():N}");
+        try
+        {
+            var model = Path.Combine(root, "game", "Lucius3_Data", "StreamingAssets", "Notebook.xml");
+            var fixture = Path.Combine(root, "persistent", "Game", "Notebook.xml");
+            Directory.CreateDirectory(Path.GetDirectoryName(model)!);
+            Directory.CreateDirectory(Path.GetDirectoryName(fixture)!);
+            var sourceModelHash = FileTools.Sha256Async(modelSource).GetAwaiter().GetResult();
+            var sourceFixtureHash = FileTools.Sha256Async(fixtureSource).GetAwaiter().GetResult();
+            File.Copy(modelSource, model);
+            File.Copy(fixtureSource, fixture);
+            var result = LuciusNotebookMigration.MigrateAsync(model, Path.Combine(root, "persistent"), "fixture-test", _ => { }, CancellationToken.None).GetAwaiter().GetResult();
+            if (result.Found != 1 || result.Changed != 1 || result.Skipped != 0 || result.Record?.Files.Single().TextCount != 360)
+                throw new Exception("O fixture real não produziu uma migração compatível de 360 textos.");
+            var verification = LuciusNotebookMigration.VerifyAsync(model, result.Record, _ => { }, CancellationToken.None).GetAwaiter().GetResult();
+            if (verification.Changed != 1 || verification.Skipped != 0) throw new Exception("O fixture real falhou na verificação posterior.");
+            if (FileTools.Sha256Async(modelSource).GetAwaiter().GetResult() != sourceModelHash || FileTools.Sha256Async(fixtureSource).GetAwaiter().GetResult() != sourceFixtureHash)
+                throw new Exception("Um arquivo-fonte do fixture foi modificado.");
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            File.WriteAllText(Path.Combine(Path.GetTempPath(), "br-patch-hub-lucius-fixture-error.txt"), ex.ToString());
+            return 1;
+        }
+        finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
+    }
+
     public static int Render(string output, int width = 1520, int height = 940)
     {
         var root = Path.Combine(Path.GetTempPath(), $"br-patch-hub-render-{Guid.NewGuid():N}");
@@ -50,6 +80,8 @@ public static class SelfTest
             File.WriteAllBytes(config, bytes);
             if (!FileTools.RepairLengthPrefixedUtf8(config, "Português", "English")) throw new Exception("Correção de idioma não executada.");
             if (!Encoding.UTF8.GetString(File.ReadAllBytes(config)).Contains("English")) throw new Exception("Correção de idioma inválida.");
+
+            RunLuciusNotebookMigrationTests(root);
 
             var migrationRoot = Path.Combine(root, "migration-state");
             var migratedBackup = Path.Combine(migrationRoot, "backups", "translation-backup-1");
@@ -164,5 +196,134 @@ public static class SelfTest
             return 1;
         }
         finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
+    }
+
+    private static void RunLuciusNotebookMigrationTests(string root)
+    {
+        var testRoot = Path.Combine(root, "lucius-notebook-migration");
+        var gameRoot = Path.Combine(testRoot, "game");
+        var model = Path.Combine(gameRoot, "Lucius3_Data", "StreamingAssets", "Notebook.xml");
+        var persistent = Path.Combine(testRoot, "persistent");
+        var gameNotebook = Path.Combine(persistent, "Game", "Notebook.xml");
+        var autoNotebook = Path.Combine(persistent, "AUTOSAVE", "Notebook.xml");
+        var saveFile = Path.Combine(persistent, "AUTOSAVE", "Notebook_MainPage.sav");
+        Directory.CreateDirectory(Path.GetDirectoryName(model)!);
+        Directory.CreateDirectory(Path.GetDirectoryName(gameNotebook)!);
+        Directory.CreateDirectory(Path.GetDirectoryName(autoNotebook)!);
+        File.WriteAllText(model, BuildNotebookXml("PT-BR", "false", "Lucius", "Linha inicial"), new UTF8Encoding(false));
+        File.WriteAllText(gameNotebook, BuildNotebookXml("EN", "true", "Lucius", "Diálogo salvo"), new UTF8Encoding(false));
+        File.Copy(gameNotebook, autoNotebook);
+        File.WriteAllBytes(saveFile, [1, 2, 3, 4, 5, 6]);
+        var saveHash = FileTools.Sha256Async(saveFile).GetAwaiter().GetResult();
+        var logs = new List<string>();
+
+        var migration = LuciusNotebookMigration.MigrateAsync(model, persistent, "install-test", logs.Add, CancellationToken.None).GetAwaiter().GetResult();
+        if (migration.Found != 2 || migration.Changed != 2 || migration.Skipped != 0 || migration.TextsChanged != 720 || migration.Record?.Files.Count != 2)
+            throw new Exception("Migração dos 360 textos persistentes falhou.");
+        var migratedText = File.ReadAllText(gameNotebook);
+        if (!migratedText.Contains("PT-BR 359") || !migratedText.Contains("<active>true</active>") || !migratedText.Contains("Diálogo salvo"))
+            throw new Exception("Migração alterou ou perdeu dados dinâmicos.");
+        if (FileTools.Sha256Async(saveFile).GetAwaiter().GetResult() != saveHash) throw new Exception("Arquivo .sav foi modificado pela migração.");
+
+        var backup = FileTools.ResolveInside(migration.Record.BackupRoot, "Game/Notebook.xml");
+        var backupHash = FileTools.Sha256Async(backup).GetAwaiter().GetResult();
+        var repeat = LuciusNotebookMigration.MigrateAsync(model, persistent, "install-test", logs.Add, CancellationToken.None).GetAwaiter().GetResult();
+        if (repeat.TextsChanged != 0 || FileTools.Sha256Async(backup).GetAwaiter().GetResult() != backupHash)
+            throw new Exception("Migração repetida sobrescreveu o backup ou não foi idempotente.");
+
+        var incompatible = Path.Combine(persistent, "SaveIncompativel", "Notebook.xml");
+        Directory.CreateDirectory(Path.GetDirectoryName(incompatible)!);
+        File.WriteAllText(incompatible, "<NotebookData version=\"999\"><text>não alterar</text></NotebookData>");
+        var incompatibleHash = FileTools.Sha256Async(incompatible).GetAwaiter().GetResult();
+        var withInvalid = LuciusNotebookMigration.MigrateAsync(model, persistent, "install-test", logs.Add, CancellationToken.None).GetAwaiter().GetResult();
+        if (withInvalid.Skipped != 1 || FileTools.Sha256Async(incompatible).GetAwaiter().GetResult() != incompatibleHash || !logs.Any(x => x.Contains("Arquivo incompatível ignorado")))
+            throw new Exception("Notebook incompatível não foi preservado corretamente.");
+
+        var verified = LuciusNotebookMigration.VerifyAsync(model, migration.Record, logs.Add, CancellationToken.None).GetAwaiter().GetResult();
+        if (verified.Changed != 2 || verified.Skipped != 0) throw new Exception("Verificação dos notebooks persistentes falhou.");
+
+        var dynamic = File.ReadAllText(gameNotebook).Replace("<active>true</active>", "<active>false</active>").Replace("Diálogo salvo", "Diálogo novo após instalação");
+        File.WriteAllText(gameNotebook, dynamic, new UTF8Encoding(false));
+        var reverted = LuciusNotebookMigration.RevertTextsAsync(model, migration.Record, logs.Add, CancellationToken.None).GetAwaiter().GetResult();
+        var revertedText = File.ReadAllText(gameNotebook);
+        if (reverted.Changed != 2 || !revertedText.Contains("EN 359") || !revertedText.Contains("Diálogo novo após instalação") || !revertedText.Contains("<active>false</active>"))
+            throw new Exception("Reversão não preservou progresso e diálogo novos.");
+        if (FileTools.Sha256Async(saveFile).GetAwaiter().GetResult() != saveHash) throw new Exception("Arquivo .sav foi modificado pela reversão.");
+        if (Directory.EnumerateFiles(persistent, "*.tmp", SearchOption.AllDirectories).Any()) throw new Exception("Arquivo temporário residual encontrado.");
+
+        var cancelledRoot = Path.Combine(testRoot, "cancelled-persistent");
+        var cancelledA = Path.Combine(cancelledRoot, "Game", "Notebook.xml");
+        var cancelledB = Path.Combine(cancelledRoot, "SAVE", "Notebook.xml");
+        Directory.CreateDirectory(Path.GetDirectoryName(cancelledA)!);
+        Directory.CreateDirectory(Path.GetDirectoryName(cancelledB)!);
+        File.WriteAllText(cancelledA, BuildNotebookXml("EN", "true", "A", "A"), new UTF8Encoding(false));
+        File.WriteAllText(cancelledB, BuildNotebookXml("EN", "true", "B", "B"), new UTF8Encoding(false));
+        using (var cancellation = new CancellationTokenSource())
+        {
+            try
+            {
+                LuciusNotebookMigration.MigrateAsync(model, cancelledRoot, "cancel-test", message => { if (message.Contains("textos atualizados")) cancellation.Cancel(); }, cancellation.Token).GetAwaiter().GetResult();
+                throw new Exception("Cancelamento da migração não foi respeitado.");
+            }
+            catch (OperationCanceledException) { }
+        }
+        if (!File.ReadAllText(cancelledA).Contains("EN 359") || !File.ReadAllText(cancelledB).Contains("EN 359"))
+            throw new Exception("Rollback de uma migração interrompida não restaurou os notebooks.");
+
+        RunLuciusServiceIntegrationTest(testRoot);
+    }
+
+    private static void RunLuciusServiceIntegrationTest(string root)
+    {
+        var integration = Path.Combine(root, "service-integration");
+        var state = new Storage(Path.Combine(integration, "state"));
+        var game = Path.Combine(integration, "game");
+        var persistent = Path.Combine(integration, "persistent");
+        var source = Path.Combine(integration, "package");
+        var sourceModel = Path.Combine(source, "Lucius3_Data", "StreamingAssets", "Notebook.xml");
+        var gameModel = Path.Combine(game, "Lucius3_Data", "StreamingAssets", "Notebook.xml");
+        var persistentNotebook = Path.Combine(persistent, "Game", "Notebook.xml");
+        Directory.CreateDirectory(Path.GetDirectoryName(sourceModel)!);
+        Directory.CreateDirectory(Path.GetDirectoryName(gameModel)!);
+        Directory.CreateDirectory(Path.GetDirectoryName(persistentNotebook)!);
+        File.WriteAllText(sourceModel, BuildNotebookXml("PT-BR", "false", "Modelo", "Modelo"), new UTF8Encoding(false));
+        var sourceLocalization = Path.Combine(source, "Lucius3_Data", "StreamingAssets", "Localization");
+        Directory.CreateDirectory(sourceLocalization);
+        File.WriteAllText(Path.Combine(sourceLocalization, "English.csv"), "1909;Não é possível usar o coração nesta área", new UTF8Encoding(false));
+        File.Copy(Path.Combine(sourceLocalization, "English.csv"), Path.Combine(sourceLocalization, "Português.csv"));
+        File.WriteAllText(gameModel, BuildNotebookXml("EN", "false", "Jogo", "Jogo"), new UTF8Encoding(false));
+        File.WriteAllText(persistentNotebook, BuildNotebookXml("EN", "true", "Save", "Antes"), new UTF8Encoding(false));
+        var zip = Path.Combine(integration, "lucius-package.zip");
+        ZipFile.CreateFromDirectory(source, zip);
+        var hash = FileTools.Sha256Async(zip).GetAwaiter().GetResult();
+        var packageDirectory = Path.Combine(state.PackageRoot, LuciusNotebookMigration.TranslationId, "1.0.0");
+        Directory.CreateDirectory(packageDirectory);
+        File.Copy(zip, Path.Combine(packageDirectory, "lucius.zip"));
+        var translation = new Translation
+        {
+            Id = LuciusNotebookMigration.TranslationId, Game = "Lucius III", Version = "1.0.0", PackageType = "zip",
+            Install = [new InstallRule { From = "Lucius3_Data", To = "Lucius3_Data" }],
+            Assets = [new PackageAsset { Role = "package", FileName = "lucius.zip", DownloadUrl = "https://github.com/example/lucius/releases/download/v1/lucius.zip", Sha256 = hash }]
+        };
+        var service = new TranslationService(state, _ => { }, persistent);
+        service.InstallAsync(translation, game, null, CancellationToken.None).GetAwaiter().GetResult();
+        if (state.Installed[translation.Id].NotebookMigration?.Files.Count != 1 || !File.ReadAllText(persistentNotebook).Contains("PT-BR 359"))
+            throw new Exception("Instalação normal não integrou a migração persistente.");
+        if (service.GetInstallationHealthAsync(translation.Id).GetAwaiter().GetResult() != InstallationHealth.Healthy)
+            throw new Exception("Verificação normal não incluiu o caderno persistente.");
+        File.WriteAllText(persistentNotebook, File.ReadAllText(persistentNotebook).Replace("<active>true</active>", "<active>false</active>").Replace("Antes", "Depois"), new UTF8Encoding(false));
+        service.RemoveAsync(translation, null, CancellationToken.None).GetAwaiter().GetResult();
+        var result = File.ReadAllText(persistentNotebook);
+        if (!result.Contains("EN 359") || !result.Contains("<active>false</active>") || !result.Contains("Depois") || state.Installed.ContainsKey(translation.Id))
+            throw new Exception("Desinstalação normal não reverteu somente os textos persistentes.");
+    }
+
+    private static string BuildNotebookXml(string prefix, string active, string character, string dialogue)
+    {
+        var builder = new StringBuilder("<?xml version=\"1.0\" encoding=\"utf-8\"?><NotebookData version=\"320\"><Chapters><Chapter id=\"Test\"><active>");
+        builder.Append(active).Append("</active><Entries>");
+        for (var i = 0; i < 360; i++) builder.Append("<Entry id=\"").Append(i).Append("\"><text>").Append(prefix).Append(' ').Append(i).Append("</text><progress>").Append(i).Append("</progress></Entry>");
+        builder.Append("</Entries><nameOfCharacter>").Append(character).Append("</nameOfCharacter><dialogueLine>").Append(dialogue).Append("</dialogueLine></Chapter></Chapters></NotebookData>");
+        return builder.ToString();
     }
 }

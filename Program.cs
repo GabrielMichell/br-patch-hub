@@ -15,6 +15,8 @@ static class Program
             return UpdateInstaller.ApplyAndRestart(args[1], args[2], int.Parse(args[3]), args[4]);
         }
         if (args.Contains("--self-test", StringComparer.OrdinalIgnoreCase)) return SelfTest.Run();
+        if (args.Length == 3 && args[0].Equals("--lucius-notebook-test", StringComparison.OrdinalIgnoreCase))
+            return SelfTest.RunLuciusNotebookFixture(args[1], args[2]);
         if (args.Length == 2 && args[0].Equals("--render-test", StringComparison.OrdinalIgnoreCase))
         {
             ApplicationConfiguration.Initialize();
