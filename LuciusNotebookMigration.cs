@@ -14,6 +14,7 @@ public static class LuciusNotebookMigration
     public const string ModelRelativePath = "Lucius3_Data/StreamingAssets/Notebook.xml";
     public const string EnglishCsvRelativePath = "Lucius3_Data/StreamingAssets/Localization/English.csv";
     public const string PortugueseCsvRelativePath = "Lucius3_Data/StreamingAssets/Localization/Português.csv";
+    public const int ExpectedTextCount = 360;
     private const string BackupFolder = "_Backup_LuciusIII_PTBR";
 
     static LuciusNotebookMigration() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -29,7 +30,8 @@ public static class LuciusNotebookMigration
         var model = Load(modelPath);
         ValidateRoot(model, model);
         var map = BuildTextMap(model);
-        if (map.Count == 0) throw new InvalidDataException("O Notebook.xml PT-BR não possui nós <text>.");
+        if (map.Count != ExpectedTextCount)
+            throw new InvalidDataException($"O modelo oficial do Lucius III deve possuir exatamente {ExpectedTextCount} nós <text>, mas possui {map.Count}. O arquivo não será alterado.");
     }
 
     public static async Task<NotebookOperationResult> MigrateAsync(
@@ -83,8 +85,13 @@ public static class LuciusNotebookMigration
                         currentTexts[pair.Key].Value = pair.Value.Value;
                         count++;
                     }
-                    await SaveValidatedAsync(current, target, before, modelTexts, cancellationToken);
                     record.Files.Add(new NotebookMigrationFile { RelativePath = relative, BackupPath = relative, TextCount = modelTexts.Count });
+                    if (count == 0)
+                    {
+                        log($"Notebook persistente já está correto; nenhuma gravação realizada: {relative}");
+                        continue;
+                    }
+                    await SaveValidatedAsync(current, target, before, modelTexts, cancellationToken);
                     changed++;
                     textsChanged += count;
                     log($"{count} textos atualizados: {relative}");

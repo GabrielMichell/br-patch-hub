@@ -1,7 +1,7 @@
 {
-  "version": "3.2.0",
-  "releaseUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/tag/v3.2.0",
-  "downloadUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/download/v3.2.0/BR-Patch-Hub.exe",
-  "sha256": "3317D880FB98931BCCAA67915191802F1F04B5772EB6805DF6D1530D18319549",
-  "notes": "Adiciona a migração segura dos cadernos persistentes de Lucius III, com backups individuais, validação estrutural e preservação do progresso do jogador."
+  "version": "3.2.1",
+  "releaseUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/tag/v3.2.1",
+  "downloadUrl": "https://github.com/GabrielMichell/br-patch-hub/releases/download/v3.2.1/BR-Patch-Hub.exe",
+  "sha256": "94DC733D4E76198C533499EABB64727597308017182B9F5FD98DF9627A1F77C0",
+  "notes": "Completa a integração de Lucius III com idempotência estrita, validação explícita dos 360 textos e remoção da alteração desnecessária de config.sav."
 }

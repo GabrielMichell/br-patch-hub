@@ -2,7 +2,7 @@
 
 Aplicativo desktop para pesquisar traduções e instalá-las diretamente em jogos da Steam, sem abrir outro instalador.
 
-Versão oficial atual: **v3.2.0**.
+Versão oficial atual: **v3.2.1**.
 
 ## O que esta base faz
 
@@ -34,7 +34,9 @@ O BR Patch Hub não executa arquivos `.exe`. O formato recomendado para cada pro
 
 A integração `lucius-iii-ptbr` localiza recursivamente os arquivos `Notebook.xml` em `AppData\LocalLow\Shiver Games\Lucius III`, ignora a pasta `_Backup_LuciusIII_PTBR` e usa o modelo instalado em `Lucius3_Data\StreamingAssets\Notebook.xml`. Somente o conteúdo dos nós `<text>` compatíveis é alterado. Arquivos `.sav`, atributos, IDs, estados, progresso, diálogos e demais dados não textuais não são escritos.
 
-Cada `Notebook.xml` compatível recebe um backup original individual, preservando seu caminho relativo. Reinstalações não sobrescrevem o backup da mesma operação. A escrita usa um arquivo temporário e só substitui o original depois de reabrir o XML e validar estrutura, chaves, atributos e dados não textuais.
+O modelo oficial deve possuir exatamente 360 nós `<text>`. Cada `Notebook.xml` compatível recebe um backup original individual, preservando seu caminho relativo. Reinstalações não sobrescrevem o backup da mesma operação. Se os 360 textos já estiverem corretos, o arquivo não é aberto para escrita e mantém bytes e data de modificação. Quando há mudanças, a escrita usa um arquivo temporário e só substitui o original depois de reabrir o XML e validar estrutura, chaves, atributos e dados não textuais.
+
+O catálogo de Lucius III não altera `config.sav`: `English.csv` e `Português.csv` do pacote oficial são idênticos e já contêm PT-BR, portanto não existe necessidade técnica de trocar a preferência de idioma durante atualização, remoção ou restauração.
 
 Na desinstalação ou em **Restaurar original**, o Hub reverte apenas os textos que ainda são iguais ao modelo PT-BR. Se a estrutura for incompatível, o backup estiver ausente ou um texto tiver sido alterado posteriormente, o arquivo é preservado e a limitação é registrada no log; o Hub nunca restaura cegamente um `Notebook.xml` antigo sobre progresso novo.
 

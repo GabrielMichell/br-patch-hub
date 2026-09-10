@@ -20,10 +20,16 @@ public static class SelfTest
             File.Copy(modelSource, model);
             File.Copy(fixtureSource, fixture);
             var result = LuciusNotebookMigration.MigrateAsync(model, Path.Combine(root, "persistent"), "fixture-test", _ => { }, CancellationToken.None).GetAwaiter().GetResult();
-            if (result.Found != 1 || result.Changed != 1 || result.Skipped != 0 || result.Record?.Files.Single().TextCount != 360)
+            if (result.Found != 1 || result.Changed is < 0 or > 1 || result.Skipped != 0 || result.Record?.Files.Single().TextCount != LuciusNotebookMigration.ExpectedTextCount)
                 throw new Exception("O fixture real não produziu uma migração compatível de 360 textos.");
             var verification = LuciusNotebookMigration.VerifyAsync(model, result.Record, _ => { }, CancellationToken.None).GetAwaiter().GetResult();
             if (verification.Changed != 1 || verification.Skipped != 0) throw new Exception("O fixture real falhou na verificação posterior.");
+            var migratedHash = FileTools.Sha256Async(fixture).GetAwaiter().GetResult();
+            var migratedWriteTime = File.GetLastWriteTimeUtc(fixture);
+            Thread.Sleep(1100);
+            var repeated = LuciusNotebookMigration.MigrateAsync(model, Path.Combine(root, "persistent"), "fixture-test", _ => { }, CancellationToken.None).GetAwaiter().GetResult();
+            if (repeated.Changed != 0 || repeated.TextsChanged != 0 || FileTools.Sha256Async(fixture).GetAwaiter().GetResult() != migratedHash || File.GetLastWriteTimeUtc(fixture) != migratedWriteTime)
+                throw new Exception("A segunda migração do fixture real regravou um Notebook.xml que já estava correto.");
             if (FileTools.Sha256Async(modelSource).GetAwaiter().GetResult() != sourceModelHash || FileTools.Sha256Async(fixtureSource).GetAwaiter().GetResult() != sourceFixtureHash)
                 throw new Exception("Um arquivo-fonte do fixture foi modificado.");
             return 0;
@@ -182,6 +188,8 @@ public static class SelfTest
             {
                 var catalog = JsonSerializer.Deserialize<Catalog>(File.ReadAllText(catalogPath), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 if (catalog is null || catalog.SchemaVersion < 1 || catalog.Translations.Count == 0) throw new Exception("Catálogo embarcado inválido.");
+                var luciusCatalog = catalog.Translations.SingleOrDefault(x => LuciusNotebookMigration.AppliesTo(x.Id));
+                if (luciusCatalog?.LanguagePreferenceRepair is not null) throw new Exception("O catálogo de Lucius III ainda permite modificar config.sav.");
                 var staleStorage = new Storage(Path.Combine(root, "stale-state")); var stale = catalog.Translations[0]; staleStorage.Installed[stale.Id] = new InstalledTranslation { Id = stale.Id, Game = stale.Game, Version = stale.Version, GamePath = Path.Combine(root, "jogo-removido") }; staleStorage.Config.GamePaths[stale.Id] = Path.Combine(root, "jogo-removido"); staleStorage.SaveInstalled(); staleStorage.SaveConfig(); using var staleForm = new MainForm(staleStorage, false); var reconcile = typeof(MainForm).GetMethod("ReconcileUninstalledGames", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic) ?? throw new Exception("Rotina de reconciliação ausente."); reconcile.Invoke(staleForm, null); if (staleStorage.Installed.ContainsKey(stale.Id) || staleStorage.Config.GamePaths.ContainsKey(stale.Id)) throw new Exception("Registro de jogo desinstalado não foi limpo.");
             }
             using var form = new MainForm(new Storage(Path.Combine(root, "ui-state")));
@@ -227,9 +235,17 @@ public static class SelfTest
 
         var backup = FileTools.ResolveInside(migration.Record.BackupRoot, "Game/Notebook.xml");
         var backupHash = FileTools.Sha256Async(backup).GetAwaiter().GetResult();
+        var gameNotebookHash = FileTools.Sha256Async(gameNotebook).GetAwaiter().GetResult();
+        var gameNotebookWriteTime = File.GetLastWriteTimeUtc(gameNotebook);
+        Thread.Sleep(1100);
         var repeat = LuciusNotebookMigration.MigrateAsync(model, persistent, "install-test", logs.Add, CancellationToken.None).GetAwaiter().GetResult();
-        if (repeat.TextsChanged != 0 || FileTools.Sha256Async(backup).GetAwaiter().GetResult() != backupHash)
+        if (repeat.Changed != 0 || repeat.TextsChanged != 0 || FileTools.Sha256Async(backup).GetAwaiter().GetResult() != backupHash || FileTools.Sha256Async(gameNotebook).GetAwaiter().GetResult() != gameNotebookHash || File.GetLastWriteTimeUtc(gameNotebook) != gameNotebookWriteTime)
             throw new Exception("Migração repetida sobrescreveu o backup ou não foi idempotente.");
+
+        var invalidModel = Path.Combine(testRoot, "invalid-model.xml");
+        File.WriteAllText(invalidModel, BuildNotebookXml("PT-BR", "false", "Lucius", "Linha", 359), new UTF8Encoding(false));
+        try { LuciusNotebookMigration.ValidateModel(invalidModel); throw new Exception("Modelo com 359 textos não foi rejeitado."); }
+        catch (InvalidDataException ex) when (ex.Message.Contains("exatamente 360", StringComparison.OrdinalIgnoreCase)) { }
 
         var incompatible = Path.Combine(persistent, "SaveIncompativel", "Notebook.xml");
         Directory.CreateDirectory(Path.GetDirectoryName(incompatible)!);
@@ -283,6 +299,8 @@ public static class SelfTest
         var sourceModel = Path.Combine(source, "Lucius3_Data", "StreamingAssets", "Notebook.xml");
         var gameModel = Path.Combine(game, "Lucius3_Data", "StreamingAssets", "Notebook.xml");
         var persistentNotebook = Path.Combine(persistent, "Game", "Notebook.xml");
+        var configSave = Path.Combine(persistent, "config.sav");
+        var binarySave = Path.Combine(persistent, "Game", "Notebook_MainPage.sav");
         Directory.CreateDirectory(Path.GetDirectoryName(sourceModel)!);
         Directory.CreateDirectory(Path.GetDirectoryName(gameModel)!);
         Directory.CreateDirectory(Path.GetDirectoryName(persistentNotebook)!);
@@ -293,6 +311,10 @@ public static class SelfTest
         File.Copy(Path.Combine(sourceLocalization, "English.csv"), Path.Combine(sourceLocalization, "Português.csv"));
         File.WriteAllText(gameModel, BuildNotebookXml("EN", "false", "Jogo", "Jogo"), new UTF8Encoding(false));
         File.WriteAllText(persistentNotebook, BuildNotebookXml("EN", "true", "Save", "Antes"), new UTF8Encoding(false));
+        File.WriteAllBytes(configSave, [10, 20, 30, 40, 50]);
+        File.WriteAllBytes(binarySave, [60, 70, 80, 90]);
+        var configHash = FileTools.Sha256Async(configSave).GetAwaiter().GetResult();
+        var binarySaveHash = FileTools.Sha256Async(binarySave).GetAwaiter().GetResult();
         var zip = Path.Combine(integration, "lucius-package.zip");
         ZipFile.CreateFromDirectory(source, zip);
         var hash = FileTools.Sha256Async(zip).GetAwaiter().GetResult();
@@ -311,18 +333,23 @@ public static class SelfTest
             throw new Exception("Instalação normal não integrou a migração persistente.");
         if (service.GetInstallationHealthAsync(translation.Id).GetAwaiter().GetResult() != InstallationHealth.Healthy)
             throw new Exception("Verificação normal não incluiu o caderno persistente.");
+        service.InstallAsync(translation, game, null, CancellationToken.None).GetAwaiter().GetResult();
+        if (service.GetInstallationHealthAsync(translation.Id).GetAwaiter().GetResult() != InstallationHealth.Healthy)
+            throw new Exception("Atualização/reinstalação do Lucius III não permaneceu íntegra.");
         File.WriteAllText(persistentNotebook, File.ReadAllText(persistentNotebook).Replace("<active>true</active>", "<active>false</active>").Replace("Antes", "Depois"), new UTF8Encoding(false));
         service.RemoveAsync(translation, null, CancellationToken.None).GetAwaiter().GetResult();
         var result = File.ReadAllText(persistentNotebook);
         if (!result.Contains("EN 359") || !result.Contains("<active>false</active>") || !result.Contains("Depois") || state.Installed.ContainsKey(translation.Id))
             throw new Exception("Desinstalação normal não reverteu somente os textos persistentes.");
+        if (FileTools.Sha256Async(configSave).GetAwaiter().GetResult() != configHash || FileTools.Sha256Async(binarySave).GetAwaiter().GetResult() != binarySaveHash)
+            throw new Exception("Instalação, atualização ou desinstalação modificou um arquivo .sav.");
     }
 
-    private static string BuildNotebookXml(string prefix, string active, string character, string dialogue)
+    private static string BuildNotebookXml(string prefix, string active, string character, string dialogue, int textCount = 360)
     {
         var builder = new StringBuilder("<?xml version=\"1.0\" encoding=\"utf-8\"?><NotebookData version=\"320\"><Chapters><Chapter id=\"Test\"><active>");
         builder.Append(active).Append("</active><Entries>");
-        for (var i = 0; i < 360; i++) builder.Append("<Entry id=\"").Append(i).Append("\"><text>").Append(prefix).Append(' ').Append(i).Append("</text><progress>").Append(i).Append("</progress></Entry>");
+        for (var i = 0; i < textCount; i++) builder.Append("<Entry id=\"").Append(i).Append("\"><text>").Append(prefix).Append(' ').Append(i).Append("</text><progress>").Append(i).Append("</progress></Entry>");
         builder.Append("</Entries><nameOfCharacter>").Append(character).Append("</nameOfCharacter><dialogueLine>").Append(dialogue).Append("</dialogueLine></Chapter></Chapters></NotebookData>");
         return builder.ToString();
     }
