@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "catalogName": "Catálogo do BR Patch Hub",
-  "updatedAt": "2026-09-07T14:14:10Z",
+  "updatedAt": "2026-09-12T00:00:00Z",
   "translations": [
     {
       "id": "lucius-ii-ptbr",
@@ -316,6 +316,29 @@
           "fileName": "LEGO-Harry-Potter-Years-1-4-PTBR-v1.0.0.zip",
           "downloadUrl": "https://github.com/GabrielMichell/lego-harry-potter-years-1-4-ptbr/releases/download/v1.0.0/LEGO-Harry-Potter-Years-1-4-PTBR-v1.0.0.zip",
           "sha256": "514b6ede68bccf3197d59775b53ad5eea2bfaee6069d60226cbb0db6c6a88570"
+        }
+      ]
+    },
+    {
+      "id": "bioshock-2-remastered-ptbr",
+      "game": "BioShock 2 Remastered",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "packageType": "zip",
+      "description": "Tradução de fã PT-BR para a versão Steam de BioShock 2 Remastered, com interface, menus, opções, objetivos, mensagens, legendas e textos de inspeção de placas, pôsteres, anúncios, grafites e letreiros.",
+      "releaseUrl": "https://github.com/GabrielMichell/bioshock-2-remastered-ptbr/releases/tag/v1.0.0",
+      "steamAppId": "409720",
+      "folderHints": ["BioShock 2 Remastered"],
+      "executableHints": ["Bioshock2HD.exe"],
+      "install": [
+        { "from": ".", "to": "game" }
+      ],
+      "assets": [
+        {
+          "role": "package",
+          "fileName": "BioShock-2-Remastered-PTBR-v1.0.0.zip",
+          "downloadUrl": "https://github.com/GabrielMichell/bioshock-2-remastered-ptbr/releases/download/v1.0.0/BioShock-2-Remastered-PTBR-v1.0.0.zip",
+          "sha256": "1A8E5158E482F14EDA00A16F04CE9C48609750B7C81BDACF849CA43CD7441EBE"
         }
       ]
     }
