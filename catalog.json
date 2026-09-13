@@ -364,6 +364,29 @@
           "sha256": "7FFBFA0C82CAB5FA68173B3C7C46407CA0ACE2C08FBEE71E08EF968B55E9ABE9"
         }
       ]
+    },
+    {
+      "id": "resident-evil-0-ptbr",
+      "game": "Resident Evil 0",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "packageType": "zip",
+      "description": "Tradução de fã PT-BR para a versão Steam de Resident Evil 0, com menus, opções, textos de jogo, manuais, notas, diários, relatórios, folhetos e legendas das cutscenes.",
+      "releaseUrl": "https://github.com/GabrielMichell/resident-evil-0-ptbr/releases/tag/v1.0.0",
+      "steamAppId": "339340",
+      "folderHints": ["Resident Evil 0"],
+      "executableHints": ["re0hd.exe"],
+      "install": [
+        { "from": ".", "to": "game" }
+      ],
+      "assets": [
+        {
+          "role": "package",
+          "fileName": "Resident-Evil-0-PTBR-v1.0.0.zip",
+          "downloadUrl": "https://github.com/GabrielMichell/resident-evil-0-ptbr/releases/download/v1.0.0/Resident-Evil-0-PTBR-v1.0.0.zip",
+          "sha256": "f38c9810ea280ae8c1a975b88975729bb60f1b4b5bd6b45d258801137a92a6a1"
+        }
+      ]
     }
   ]
 }
