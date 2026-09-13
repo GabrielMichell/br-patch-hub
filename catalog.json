@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "catalogName": "Catálogo do BR Patch Hub",
-  "updatedAt": "2026-09-12T00:00:00Z",
+  "updatedAt": "2026-09-13T00:00:00Z",
   "translations": [
     {
       "id": "lucius-ii-ptbr",
@@ -339,6 +339,29 @@
           "fileName": "BioShock-2-Remastered-PTBR-v1.0.0.zip",
           "downloadUrl": "https://github.com/GabrielMichell/bioshock-2-remastered-ptbr/releases/download/v1.0.0/BioShock-2-Remastered-PTBR-v1.0.0.zip",
           "sha256": "1A8E5158E482F14EDA00A16F04CE9C48609750B7C81BDACF849CA43CD7441EBE"
+        }
+      ]
+    },
+    {
+      "id": "bioshock-remastered-ptbr",
+      "game": "BioShock Remastered",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "packageType": "zip",
+      "description": "Tradução de fã PT-BR para a versão Steam de BioShock Remastered, com interface, menus, opções, textos de jogo, legendas da introdução e legendas de comentários.",
+      "releaseUrl": "https://github.com/GabrielMichell/bioshock-remastered-ptbr/releases/tag/v1.0.0",
+      "steamAppId": "409710",
+      "folderHints": ["BioShock Remastered"],
+      "executableHints": ["BioshockHD.exe"],
+      "install": [
+        { "from": ".", "to": "game" }
+      ],
+      "assets": [
+        {
+          "role": "package",
+          "fileName": "BioShock-Remastered-PTBR-v1.0.0.zip",
+          "downloadUrl": "https://github.com/GabrielMichell/bioshock-remastered-ptbr/releases/download/v1.0.0/BioShock-Remastered-PTBR-v1.0.0.zip",
+          "sha256": "7FFBFA0C82CAB5FA68173B3C7C46407CA0ACE2C08FBEE71E08EF968B55E9ABE9"
         }
       ]
     }
