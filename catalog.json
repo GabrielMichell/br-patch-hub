@@ -387,6 +387,29 @@
           "sha256": "f38c9810ea280ae8c1a975b88975729bb60f1b4b5bd6b45d258801137a92a6a1"
         }
       ]
+    },
+    {
+      "id": "resident-evil-hd-remaster-ptbr",
+      "game": "Resident Evil",
+      "language": "pt-BR",
+      "version": "1.0.0",
+      "packageType": "zip",
+      "description": "Tradução de fã PT-BR para Resident Evil Biohazard HD REMASTER, com textos de jogo, menus, opções, interface, inventário, arquivos, questionário inicial e textos gráficos incorporados.",
+      "releaseUrl": "https://github.com/GabrielMichell/resident-evil-hd-remaster-ptbr/releases/tag/v1.0.0",
+      "steamAppId": "304240",
+      "folderHints": ["Resident Evil Biohazard HD REMASTER", "Resident Evil"],
+      "executableHints": ["bhd.exe"],
+      "install": [
+        { "from": ".", "to": "game" }
+      ],
+      "assets": [
+        {
+          "role": "package",
+          "fileName": "Resident-Evil-HD-Remaster-PTBR-v1.0.0.zip",
+          "downloadUrl": "https://github.com/GabrielMichell/resident-evil-hd-remaster-ptbr/releases/download/v1.0.0/Resident-Evil-HD-Remaster-PTBR-v1.0.0.zip",
+          "sha256": "cb6b26b4fe22cedcfcf837e30bdc14f36e659beb3fe06616ffc464e1be175e61"
+        }
+      ]
     }
   ]
 }
